@@ -13,7 +13,7 @@ class TryMyDayApp extends StatelessWidget {
     const surface = Color(0xFFFFFBF5);
     const ink = Color(0xFF1F2A1F);
     const accent = Color(0xFF2F6B4F);
-    const highlight = Color(0xFFD9958);
+    const highlight = Color(0x0ffd9958);
 
     final baseTheme = ThemeData.light(useMaterial3: true);
 
