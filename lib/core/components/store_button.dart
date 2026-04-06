@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../utils/app_colors.dart';
 
@@ -16,6 +17,14 @@ class StoreButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const upperFontSize = 11.0;
+    const lowerFontSize = 21.0;
+    const iconSlotSize = lowerFontSize + 15;
+    final iconSize = _iconScale(icon) * iconSlotSize;
+    final iconWidget = icon.fontPackage == 'font_awesome_flutter'
+        ? FaIcon(icon, color: Colors.white, size: iconSize)
+        : Icon(icon, color: Colors.white, size: iconSize);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
@@ -32,7 +41,11 @@ class StoreButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 34),
+          SizedBox(
+            width: iconSlotSize,
+            height: iconSlotSize,
+            child: Center(child: iconWidget),
+          ),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +55,7 @@ class StoreButton extends StatelessWidget {
                 upperLabel,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.78),
-                  fontSize: 11,
+                  fontSize: upperFontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -50,7 +63,7 @@ class StoreButton extends StatelessWidget {
                 lowerLabel,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 21,
+                  fontSize: lowerFontSize,
                   fontWeight: FontWeight.w800,
                   height: 1,
                 ),
@@ -60,5 +73,15 @@ class StoreButton extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  double _iconScale(IconData value) {
+    if (value == FontAwesomeIcons.apple) {
+      return 0.83;
+    }
+    if (value == FontAwesomeIcons.googlePlay) {
+      return 0.75;
+    }
+    return 0.82;
   }
 }

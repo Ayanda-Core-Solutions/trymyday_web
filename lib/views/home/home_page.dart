@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/components/store_button.dart';
 import '../../core/utils/app_colors.dart';
+import '../../core/utils/app_icons.dart';
 import '../../core/utils/app_images.dart';
 
 class HomePage extends StatelessWidget {
@@ -273,17 +274,17 @@ class _HeroSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 28),
-                  const Wrap(
+                  Wrap(
                     spacing: 16,
                     runSpacing: 16,
                     children: [
                       StoreButton(
-                        icon: Icons.apple,
+                        icon: AppIcons.apple,
                         upperLabel: 'Download on the',
                         lowerLabel: 'App Store',
                       ),
                       StoreButton(
-                        icon: Icons.play_arrow_rounded,
+                        icon: AppIcons.googlePlay,
                         upperLabel: 'Get it on',
                         lowerLabel: 'Google Play',
                       ),
@@ -467,10 +468,10 @@ class _PhoneScreen extends StatelessWidget {
             children: [
               const _BrandLockup(iconSize: 16, fontSize: 12),
               const Spacer(),
-              const Icon(Icons.search, color: AppColors.textMuted, size: 18),
+              const Icon(AppIcons.search, color: AppColors.textMuted, size: 18),
               const SizedBox(width: 10),
               const Icon(
-                Icons.notifications_none,
+                AppIcons.notifications,
                 color: AppColors.textMuted,
                 size: 18,
               ),
@@ -479,7 +480,7 @@ class _PhoneScreen extends StatelessWidget {
                 radius: 12,
                 backgroundColor: AppColors.surfaceMuted,
                 child: const Icon(
-                  Icons.person,
+                  AppIcons.person,
                   size: 14,
                   color: AppColors.primary,
                 ),
@@ -495,7 +496,7 @@ class _PhoneScreen extends StatelessWidget {
             ),
             child: const Row(
               children: [
-                Icon(Icons.search, color: AppColors.textMuted, size: 18),
+                Icon(AppIcons.search, color: AppColors.textMuted, size: 18),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -629,7 +630,7 @@ class _SessionBanner extends StatelessWidget {
       ),
       child: const Row(
         children: [
-          Icon(Icons.schedule, size: 16, color: AppColors.primary),
+          Icon(AppIcons.schedule, size: 16, color: AppColors.primary),
           SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -747,7 +748,7 @@ class _ProfessionalCard extends StatelessWidget {
               final stats = const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.star, color: Color(0xFFF2B51F), size: 14),
+                  Icon(AppIcons.star, color: Color(0xFFF2B51F), size: 14),
                   SizedBox(width: 4),
                   Text(
                     '4.9',
