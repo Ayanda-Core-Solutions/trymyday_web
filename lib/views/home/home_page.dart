@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../core/components/store_button.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_images.dart';
 
@@ -100,23 +101,22 @@ class _Header extends StatelessWidget {
                     : const Row(
                         children: [
                           _Brand(),
-                          SizedBox(width: 84),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                _NavItem(label: 'About'),
-                                SizedBox(width: 36),
-                                _NavItem(label: 'How it works'),
-                                SizedBox(width: 36),
-                                _NavItem(label: 'For Professionals'),
-                                SizedBox(width: 36),
-                                _NavItem(label: 'FAQ'),
-                                SizedBox(width: 36),
-                                _NavItem(label: 'Contact Us'),
-                              ],
-                            ),
+                          Spacer(),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _NavItem(label: 'About'),
+                              SizedBox(width: 36),
+                              _NavItem(label: 'How it works'),
+                              SizedBox(width: 36),
+                              _NavItem(label: 'For Professionals'),
+                              SizedBox(width: 36),
+                              _NavItem(label: 'FAQ'),
+                              SizedBox(width: 36),
+                              _NavItem(label: 'Contact Us'),
+                            ],
                           ),
-                          SizedBox(width: 24),
+                          SizedBox(width: 42),
                           _GetAppButton(),
                         ],
                       ),
@@ -250,26 +250,6 @@ class _HeroSection extends StatelessWidget {
               final copy = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: const Text(
-                      'Career guidance through real conversations',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 22),
                   Text(
                     'Guidance that\ngets you there.',
                     style: TextStyle(
@@ -297,12 +277,12 @@ class _HeroSection extends StatelessWidget {
                     spacing: 16,
                     runSpacing: 16,
                     children: [
-                      _StoreButton(
+                      StoreButton(
                         icon: Icons.apple,
                         upperLabel: 'Download on the',
                         lowerLabel: 'App Store',
                       ),
-                      _StoreButton(
+                      StoreButton(
                         icon: Icons.play_arrow_rounded,
                         upperLabel: 'Get it on',
                         lowerLabel: 'Google Play',
@@ -340,66 +320,6 @@ class _HeroSection extends StatelessWidget {
             },
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _StoreButton extends StatelessWidget {
-  const _StoreButton({
-    required this.icon,
-    required this.upperLabel,
-    required this.lowerLabel,
-  });
-
-  final IconData icon;
-  final String upperLabel;
-  final String lowerLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 16,
-            offset: Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 34),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                upperLabel,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.78),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                lowerLabel,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 21,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
