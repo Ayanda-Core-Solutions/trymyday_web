@@ -5,7 +5,6 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:trymyday_web/app.dart';
@@ -16,7 +15,7 @@ void main() {
 
     expect(find.text('Guidance that\ngets you there.'), findsOneWidget);
     expect(
-      find.text('Simple on the surface.\nUseful when it counts.'),
+      find.text('From search to session in four simple steps.'),
       findsOneWidget,
     );
     expect(
@@ -24,7 +23,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Get the App'), findsOneWidget);
-    expect(find.byIcon(Icons.apple), findsOneWidget);
-    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+    expect(find.text('App Store'), findsOneWidget);
+    expect(find.text('Google Play'), findsOneWidget);
   });
 }

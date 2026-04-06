@@ -1,0 +1,14 @@
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "trymyday-1d798",
+          "configurations": {
+            "web": "1:87113022489:web:abb441a9e2a5bafe06fe88"
+          }
+        }
+      }
+    }
+  }
+}
