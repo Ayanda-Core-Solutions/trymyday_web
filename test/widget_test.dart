@@ -8,20 +8,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:trymyday_web/main.dart';
+import 'package:trymyday_web/app.dart';
 
 void main() {
   testWidgets('renders TryMyDay landing page', (WidgetTester tester) async {
     await tester.pumpWidget(const TryMyDayApp());
 
-    expect(find.text('TryMyDay'), findsOneWidget);
+    expect(find.text('Guidance that\ngets you there.'), findsOneWidget);
     expect(
-      find.text('Plan better days with one clear mobile companion.'),
+      find.text('Simple on the surface.\nUseful when it counts.'),
       findsOneWidget,
     );
-    expect(find.text('User support'), findsOneWidget);
-    expect(find.text('Download TryMyDay'), findsOneWidget);
+    expect(
+      find.text('Share what you know.\nHelp someone move faster.'),
+      findsOneWidget,
+    );
+    expect(find.text('Get the App'), findsOneWidget);
     expect(find.byIcon(Icons.apple), findsOneWidget);
-    expect(find.byIcon(Icons.android), findsOneWidget);
+    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
   });
 }
