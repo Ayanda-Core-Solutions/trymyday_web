@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/components/store_button.dart';
+import '../../core/services/app_remote_config.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_icons.dart';
 import '../../core/utils/app_images.dart';
@@ -247,6 +248,8 @@ class _HeroSection extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final wide = constraints.maxWidth >= 980;
+              final nearbyBadgeCount =
+                  AppRemoteConfig.instance.nearbyBadgeCount;
 
               final copy = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,7 +264,7 @@ class _HeroSection extends StatelessWidget {
                       letterSpacing: -2.4,
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 30),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 540),
                     child: const Text(
@@ -273,7 +276,7 @@ class _HeroSection extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 30),
                   Wrap(
                     spacing: 16,
                     runSpacing: 16,
@@ -291,11 +294,17 @@ class _HeroSection extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  const Wrap(
+                  Wrap(
                     spacing: 14,
                     runSpacing: 14,
                     children: [
-                      _StatCard(title: '24+', body: 'nearby professionals'),
+                      _StatCard(
+                        title: 'Nearby',
+                        body: 'professionals',
+                        badgeText: nearbyBadgeCount != null
+                            ? '+$nearbyBadgeCount'
+                            : null,
+                      ),
                       _StatCard(title: 'Paid', body: 'deeper sessions'),
                       _StatCard(title: 'Free', body: 'coffee chats'),
                     ],
@@ -327,10 +336,11 @@ class _HeroSection extends StatelessWidget {
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({required this.title, required this.body});
+  const _StatCard({required this.title, required this.body, this.badgeText});
 
   final String title;
   final String body;
+  final String? badgeText;
 
   @override
   Widget build(BuildContext context) {
@@ -349,26 +359,54 @@ class _StatCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 28,
-              fontWeight: FontWeight.w900,
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                body,
+                style: const TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 18,
+                  height: 1.25,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            body,
-            style: const TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 18,
-              height: 1.25,
+          if (badgeText != null)
+            Positioned(
+              top: -6,
+              right: -2,
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: AppColors.secondary,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  badgeText!,
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -381,19 +419,24 @@ class _PhoneShowcase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 620,
+      height: 680,
       child: Stack(
         alignment: Alignment.center,
         children: [
           Positioned(
-            bottom: 70,
+            bottom: 0,
             child: Container(
-              width: 320,
-              height: 320,
-              decoration: const BoxDecoration(
-                color: AppColors.secondary,
+              width: 470,
+              height: 470,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(
+                  255,
+                  237,
+                  241,
+                  103,
+                ).withValues(alpha: 0.62),
                 shape: BoxShape.circle,
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Color(0x40D5DF51),
                     blurRadius: 70,
@@ -403,35 +446,93 @@ class _PhoneShowcase extends StatelessWidget {
               ),
             ),
           ),
-          Container(
-            width: 300,
-            height: 560,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF221C17),
-              borderRadius: BorderRadius.circular(40),
-              border: Border.all(color: const Color(0xFFB87E2E), width: 3),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x4D000000),
-                  blurRadius: 42,
-                  offset: Offset(18, 26),
+          SizedBox(
+            width: 340,
+            height: 636,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const Positioned(
+                  left: 6,
+                  top: 128,
+                  child: _PhoneSideButton(height: 34, width: 6),
+                ),
+                const Positioned(
+                  left: 6,
+                  top: 182,
+                  child: _PhoneSideButton(height: 64, width: 6),
+                ),
+                const Positioned(
+                  left: 6,
+                  top: 262,
+                  child: _PhoneSideButton(height: 64, width: 6),
+                ),
+                const Positioned(
+                  right: 6,
+                  top: 208,
+                  child: _PhoneSideButton(height: 92, width: 6),
+                ),
+                Container(
+                  width: 324,
+                  height: 636,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1C1A18),
+                    borderRadius: BorderRadius.circular(52),
+                    border: Border.all(
+                      color: const Color(0xFFB7792D),
+                      width: 2.6,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x4D000000),
+                        blurRadius: 42,
+                        offset: Offset(18, 26),
+                      ),
+                    ],
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(44),
+                    ),
+                    child: Column(
+                      children: const [
+                        SizedBox(height: 12),
+                        _PhoneNotch(),
+                        Expanded(child: _PhoneScreen()),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Column(
-                children: const [
-                  SizedBox(height: 8),
-                  _PhoneNotch(),
-                  Expanded(child: _PhoneScreen()),
-                ],
-              ),
-            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PhoneSideButton extends StatelessWidget {
+  const _PhoneSideButton({required this.height, this.width = 6});
+
+  final double height;
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFB7792D),
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x40000000),
+            blurRadius: 2,
+            offset: Offset(0, 1),
           ),
         ],
       ),
@@ -445,11 +546,24 @@ class _PhoneNotch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 76,
-      height: 18,
+      width: 98,
+      height: 26,
+      margin: const EdgeInsets.only(top: 2),
       decoration: BoxDecoration(
         color: const Color(0xFF191919),
         borderRadius: BorderRadius.circular(999),
+      ),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Container(
+          width: 10,
+          height: 10,
+          margin: const EdgeInsets.only(right: 14),
+          decoration: const BoxDecoration(
+            color: Color(0xFF2A2435),
+            shape: BoxShape.circle,
+          ),
+        ),
       ),
     );
   }
@@ -461,7 +575,7 @@ class _PhoneScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         children: [
           Row(
