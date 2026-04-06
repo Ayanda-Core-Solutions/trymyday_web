@@ -1,6 +1,7 @@
 class AppImages {
-  static const String logoGreen =
-      'assets/images/logos/logo_text_green_transparent.png';
-  static const String logoWhite =
-      'assets/images/logos/logo_white_transparent.png';
+  static const String _baseDir = 'assets/images/';
+  static const String _logoDir = '${_baseDir}logos/';
+
+  static const String smileyGreen = '${_logoDir}Green smiley.svg';
+  static const String smileyWhite = '${_logoDir}White smiley.svg';
 }

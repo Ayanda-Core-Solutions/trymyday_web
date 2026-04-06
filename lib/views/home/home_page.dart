@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_images.dart';
@@ -47,31 +48,33 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border(
+          top: BorderSide(color: AppColors.border.withValues(alpha: 0.45)),
+          bottom: BorderSide(color: AppColors.border.withValues(alpha: 0.65)),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x120B2F2B),
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1240),
+          constraints: const BoxConstraints(maxWidth: 1360),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final compact = constraints.maxWidth < 860;
+              final compact = constraints.maxWidth < 900;
 
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 18,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.92),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: AppColors.border),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: AppColors.shadow,
-                      blurRadius: 30,
-                      offset: Offset(0, 16),
-                    ),
-                  ],
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: compact ? 20 : 48,
+                  vertical: compact ? 18 : 14,
                 ),
                 child: compact
                     ? const Column(
@@ -80,36 +83,41 @@ class _Header extends StatelessWidget {
                           _Brand(),
                           SizedBox(height: 18),
                           Wrap(
-                            spacing: 12,
-                            runSpacing: 12,
+                            spacing: 18,
+                            runSpacing: 14,
                             children: [
                               _NavItem(label: 'About'),
                               _NavItem(label: 'How it works'),
                               _NavItem(label: 'For Professionals'),
                               _NavItem(label: 'FAQ'),
                               _NavItem(label: 'Contact Us'),
-                              _GetAppButton(),
                             ],
                           ),
+                          SizedBox(height: 18),
+                          _GetAppButton(),
                         ],
                       )
                     : const Row(
                         children: [
                           _Brand(),
-                          Spacer(),
-                          Wrap(
-                            spacing: 24,
-                            runSpacing: 12,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              _NavItem(label: 'About'),
-                              _NavItem(label: 'How it works'),
-                              _NavItem(label: 'For Professionals'),
-                              _NavItem(label: 'FAQ'),
-                              _NavItem(label: 'Contact Us'),
-                              _GetAppButton(),
-                            ],
+                          SizedBox(width: 84),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                _NavItem(label: 'About'),
+                                SizedBox(width: 36),
+                                _NavItem(label: 'How it works'),
+                                SizedBox(width: 36),
+                                _NavItem(label: 'For Professionals'),
+                                SizedBox(width: 36),
+                                _NavItem(label: 'FAQ'),
+                                SizedBox(width: 36),
+                                _NavItem(label: 'Contact Us'),
+                              ],
+                            ),
                           ),
+                          SizedBox(width: 24),
+                          _GetAppButton(),
                         ],
                       ),
               );
@@ -126,7 +134,61 @@ class _Brand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(AppImages.logoGreen, height: 42, fit: BoxFit.contain);
+    return const _BrandLockup();
+  }
+}
+
+class _BrandLockup extends StatelessWidget {
+  const _BrandLockup({
+    this.iconAsset = AppImages.smileyWhite,
+    this.textColor = AppColors.primary,
+    this.iconSize = 40,
+    this.fontSize = 22,
+    this.iconBackground,
+    this.iconColor = Colors.white,
+  });
+
+  final String iconAsset;
+  final Color textColor;
+  final double iconSize;
+  final double fontSize;
+  final Color? iconBackground;
+  final Color iconColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final background = iconBackground ?? AppColors.primary;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: iconSize,
+          height: iconSize,
+          padding: EdgeInsets.all(iconSize * 0.14),
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(iconSize * 0.36),
+          ),
+          child: SvgPicture.asset(
+            iconAsset,
+            fit: BoxFit.contain,
+            colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+          ),
+        ),
+        SizedBox(width: iconSize * 0.28),
+        Text(
+          'TryMyDay',
+          style: TextStyle(
+            color: textColor,
+            fontSize: fontSize,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.8,
+            height: 1,
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -142,7 +204,7 @@ class _NavItem extends StatelessWidget {
       style: const TextStyle(
         color: AppColors.primary,
         fontSize: 14,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
       ),
     );
   }
@@ -154,14 +216,18 @@ class _GetAppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
         color: AppColors.secondary,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: const Text(
         'Get the App',
-        style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800),
+        style: TextStyle(
+          color: AppColors.primary,
+          fontSize: 14,
+          fontWeight: FontWeight.w900,
+        ),
       ),
     );
   }
@@ -479,7 +545,7 @@ class _PhoneScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Image.asset(AppImages.logoGreen, height: 20),
+              const _BrandLockup(iconSize: 16, fontSize: 12),
               const Spacer(),
               const Icon(Icons.search, color: AppColors.textMuted, size: 18),
               const SizedBox(width: 10),
@@ -1227,7 +1293,14 @@ class _Footer extends StatelessWidget {
                 final brandBlock = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.asset(AppImages.logoWhite, height: 44),
+                    const _BrandLockup(
+                      iconAsset: AppImages.smileyWhite,
+                      textColor: Colors.white,
+                      iconSize: 44,
+                      fontSize: 18,
+                      iconBackground: Color(0xFF0F4A46),
+                      iconColor: Colors.white,
+                    ),
                     const SizedBox(height: 18),
                     Text(
                       'Career guidance through real conversations. Discover professionals, start with a coffee chat, and book sessions that move you forward.',
