@@ -15,7 +15,7 @@ void main() {
 
     expect(find.text('Guidance that\ngets you there.'), findsOneWidget);
     expect(
-      find.text('Simple on the surface.\nUseful when it counts.'),
+      find.text('From search to session in four simple steps.'),
       findsOneWidget,
     );
     expect(

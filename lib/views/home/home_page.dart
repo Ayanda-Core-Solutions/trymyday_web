@@ -496,11 +496,15 @@ class _PhoneShowcase extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(44),
                     ),
-                    child: Column(
+                    child: Stack(
                       children: const [
-                        SizedBox(height: 12),
-                        _PhoneNotch(),
-                        Expanded(child: _PhoneScreen()),
+                        Positioned.fill(child: _PhoneScreen()),
+                        Positioned(
+                          top: 14,
+                          left: 0,
+                          right: 0,
+                          child: Center(child: _PhoneNotch()),
+                        ),
                       ],
                     ),
                   ),
@@ -574,320 +578,42 @@ class _PhoneScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      child: Column(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(44),
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          Row(
-            children: [
-              const _BrandLockup(iconSize: 16, fontSize: 12),
-              const Spacer(),
-              const Icon(AppIcons.search, color: AppColors.textMuted, size: 18),
-              const SizedBox(width: 10),
-              const Icon(
-                AppIcons.notifications,
-                color: AppColors.textMuted,
-                size: 18,
-              ),
-              const SizedBox(width: 10),
-              CircleAvatar(
-                radius: 12,
-                backgroundColor: AppColors.surfaceMuted,
-                child: const Icon(
-                  AppIcons.person,
-                  size: 14,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceMuted,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Row(
-              children: [
-                Icon(AppIcons.search, color: AppColors.textMuted, size: 18),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Search professionals...',
-                    style: TextStyle(color: AppColors.textMuted, fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0xFFDCE7DA), Color(0xFFEEF4E8)],
-                      ),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: CustomPaint(painter: _MapGridPainter()),
-                  ),
-                  Positioned(
-                    top: 32,
-                    left: 18,
-                    child: _MapMarker(label: 'Marketing'),
-                  ),
-                  Positioned(
-                    top: 86,
-                    right: 36,
-                    child: _MapMarker(label: 'Design'),
-                  ),
-                  Positioned(
-                    top: 134,
-                    left: 92,
-                    child: _MapMarker(label: 'Tech'),
-                  ),
-                  Positioned(
-                    top: 188,
-                    right: 92,
-                    child: _MapMarker(label: 'Law'),
-                  ),
-                  Positioned(
-                    left: 12,
-                    right: 12,
-                    bottom: 14,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        _SessionBanner(),
-                        SizedBox(height: 12),
-                        _ProfessionalCard(
-                          name: 'Alex Chen',
-                          role: 'Senior Software Engineer at Google',
-                          rate: 'R250/hour',
-                        ),
-                        SizedBox(height: 10),
-                        _ProfessionalCard(
-                          name: 'Sarah Johnson',
-                          role: 'Marketing Director at Spotify',
-                          rate: 'Free coffee chat',
-                          highlighted: false,
-                        ),
-                      ],
-                    ),
-                  ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFF8F8F5),
+                  Color(0xFFF8F8F5),
+                  Color(0xFF8DD3E7),
+                  Color(0xFFF7F8F4),
                 ],
+                stops: [0.0, 0.16, 0.42, 1.0],
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MapMarker extends StatelessWidget {
-  const _MapMarker({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 18,
-          height: 18,
-          decoration: const BoxDecoration(
-            color: AppColors.secondary,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 10,
-              color: AppColors.primary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SessionBanner extends StatelessWidget {
-  const _SessionBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.secondary.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: const Row(
-        children: [
-          Icon(AppIcons.schedule, size: 16, color: AppColors.primary),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Session in 1 hour with Alex',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProfessionalCard extends StatelessWidget {
-  const _ProfessionalCard({
-    required this.name,
-    required this.role,
-    required this.rate,
-    this.highlighted = true,
-  });
-
-  final String name;
-  final String role;
-  final String rate;
-  final bool highlighted;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 12,
-            offset: Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  name,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  rate,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
-                  style: TextStyle(
-                    color: highlighted
-                        ? AppColors.primary
-                        : AppColors.textMuted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            role,
-            style: const TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 11,
-              height: 1.35,
-            ),
-          ),
-          const SizedBox(height: 10),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final compact = constraints.maxWidth < 220;
-
-              final action = Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 7,
-                ),
-                decoration: BoxDecoration(
-                  color: highlighted
-                      ? AppColors.secondary
-                      : AppColors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  highlighted ? 'Book' : 'View profile',
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              );
-
-              final stats = const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(AppIcons.star, color: Color(0xFFF2B51F), size: 14),
-                  SizedBox(width: 4),
-                  Text(
-                    '4.9',
-                    style: TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    '10+ sessions',
-                    style: TextStyle(color: AppColors.textMuted, fontSize: 11),
-                  ),
-                ],
-              );
-
-              if (compact) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [stats, const SizedBox(height: 8), action],
+          Image.asset(
+            AppImages.phonePreview,
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+            gaplessPlayback: true,
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if (wasSynchronouslyLoaded || frame != null) {
+                return AnimatedOpacity(
+                  opacity: 1,
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOut,
+                  child: child,
                 );
               }
 
-              return Row(children: [stats, const Spacer(), action]);
+              return const SizedBox.expand();
             },
           ),
         ],
@@ -903,98 +629,121 @@ class _HowItWorksSection extends StatelessWidget {
   Widget build(BuildContext context) {
     const steps = [
       (
-        title: 'Discover nearby professionals',
+        title: 'Search',
         body:
-            'Explore a clean map-first experience built around real people, local insight, and transparent session options.',
+            'Browse professionals by field, company, interest, distance, price, or availability.',
       ),
       (
-        title: 'Start with a coffee chat',
+        title: 'Discover',
         body:
-            'Use a lighter first conversation to test fit, ask direct questions, and decide where to go deeper.',
+            'Open profiles to learn about their background, highlights, certifications, and session options.',
       ),
       (
-        title: 'Book paid sessions when needed',
+        title: 'Connect',
         body:
-            'Move into focused guidance sessions when you need structured advice, clearer planning, or accountability.',
+            'Start with a free coffee chat for quick insight or book a paid session for more depth.',
+      ),
+      (
+        title: 'Grow',
+        body:
+            'Join the session, revisit activity history, and book again as your goals evolve.',
       ),
     ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 56),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1240),
-          child: Container(
-            padding: const EdgeInsets.all(28),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(34),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 900;
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 56),
+      child: Container(
+        width: double.infinity,
+        color: AppColors.surface,
+        padding: const EdgeInsets.symmetric(vertical: 44),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1240),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth > 980;
 
-                final intro = const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'How it works',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
+                  final intro = const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'How It Works',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 14),
-                    Text(
-                      'Simple on the surface.\nUseful when it counts.',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 38,
-                        height: 1.02,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -1.2,
+                      SizedBox(height: 14),
+                      Text(
+                        'From search to session in four simple steps.',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 40,
+                          height: 1.02,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -1.2,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'The landing page keeps the same tone as the mobile app: practical, direct, and built around conversations that move people forward.',
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 17,
-                        height: 1.5,
+                      SizedBox(height: 16),
+                      Text(
+                        'This page translates the app’s main journey into plain language so new visitors know exactly what to expect.',
+                        style: TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 17,
+                          height: 1.5,
+                        ),
                       ),
-                    ),
-                  ],
-                );
+                    ],
+                  );
 
-                final cards = Wrap(
-                  spacing: 18,
-                  runSpacing: 18,
-                  children: List.generate(
-                    steps.length,
-                    (index) => _StepCard(
-                      number: '0${index + 1}',
-                      title: steps[index].title,
-                      body: steps[index].body,
-                      width: isWide
-                          ? (constraints.maxWidth - 82) / 3
-                          : double.infinity,
-                    ),
-                  ),
-                );
+                  final cards = isWide
+                      ? IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: List.generate(steps.length, (index) {
+                              return Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    right: index == steps.length - 1 ? 0 : 18,
+                                  ),
+                                  child: _StepCard(
+                                    number: '${index + 1}',
+                                    title: steps[index].title,
+                                    body: steps[index].body,
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                        )
+                      : Column(
+                          children: List.generate(steps.length, (index) {
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                bottom: index == steps.length - 1 ? 0 : 18,
+                              ),
+                              child: _StepCard(
+                                number: '${index + 1}',
+                                title: steps[index].title,
+                                body: steps[index].body,
+                              ),
+                            );
+                          }),
+                        );
 
-                return isWide
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [intro, const SizedBox(height: 28), cards],
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [intro, const SizedBox(height: 24), cards],
-                      );
-              },
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      intro,
+                      SizedBox(height: isWide ? 28 : 24),
+                      cards,
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -1008,65 +757,68 @@ class _StepCard extends StatelessWidget {
     required this.number,
     required this.title,
     required this.body,
-    required this.width,
   });
 
   final String number;
   final String title;
   final String body;
-  final double width;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      child: Container(
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceMuted,
-          borderRadius: BorderRadius.circular(26),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                number,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: AppColors.border),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(18),
             ),
-            const SizedBox(height: 20),
-            Text(
-              title,
+            alignment: Alignment.center,
+            child: Text(
+              number,
               style: const TextStyle(
-                color: AppColors.primary,
-                fontSize: 22,
-                height: 1.1,
-                fontWeight: FontWeight.w800,
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              body,
-              style: const TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 16,
-                height: 1.55,
-              ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 18,
+              height: 1.1,
+              fontWeight: FontWeight.w800,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            body,
+            style: const TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 15,
+              height: 1.45,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1437,66 +1189,4 @@ class _FooterColumn extends StatelessWidget {
       ),
     );
   }
-}
-
-class _MapGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final roadPaint = Paint()
-      ..color = const Color(0xFFBAC8B5)
-      ..strokeWidth = 4
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final minorPaint = Paint()
-      ..color = const Color(0xFFD8E1D4)
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final roads = [
-      [
-        Offset(size.width * 0.08, size.height * 0.18),
-        Offset(size.width * 0.92, size.height * 0.18),
-      ],
-      [
-        Offset(size.width * 0.15, size.height * 0.35),
-        Offset(size.width * 0.84, size.height * 0.55),
-      ],
-      [
-        Offset(size.width * 0.22, size.height * 0.08),
-        Offset(size.width * 0.28, size.height * 0.84),
-      ],
-      [
-        Offset(size.width * 0.62, size.height * 0.12),
-        Offset(size.width * 0.72, size.height * 0.88),
-      ],
-    ];
-
-    final minorRoads = [
-      [
-        Offset(size.width * 0.04, size.height * 0.52),
-        Offset(size.width * 0.9, size.height * 0.42),
-      ],
-      [
-        Offset(size.width * 0.1, size.height * 0.72),
-        Offset(size.width * 0.84, size.height * 0.72),
-      ],
-      [
-        Offset(size.width * 0.42, size.height * 0.04),
-        Offset(size.width * 0.48, size.height * 0.92),
-      ],
-    ];
-
-    for (final segment in roads) {
-      canvas.drawLine(segment.first, segment.last, roadPaint);
-    }
-
-    for (final segment in minorRoads) {
-      canvas.drawLine(segment.first, segment.last, minorPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
