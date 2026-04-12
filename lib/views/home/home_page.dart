@@ -18,6 +18,18 @@ const String faqRoute = '/faq';
 const String contactRoute = '/contact';
 const String professionalsRoute = '/professionals';
 
+class _Breakpoints {
+  static const double md = 720;
+  static const double navCompact = 900;
+  static const double professionalsStack = 930;
+  static const double heroWide = 980;
+  static const double heroShowcaseCompact = 1020;
+  static const double lg = 1040;
+  static const double phoneCompact = 420;
+  static const double howItWorksGrid = 680;
+  static const double heroCompactActions = 560;
+}
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -59,6 +71,15 @@ class _LandingPage extends StatelessWidget {
 
 enum _NavDestination { home, about, faq, contact, professionals }
 
+enum _HeaderMenuAction {
+  home,
+  about,
+  howItWorks,
+  professionals,
+  faq,
+  contact,
+}
+
 class _Header extends StatelessWidget {
   const _Header({required this.selectedNav});
 
@@ -87,7 +108,7 @@ class _Header extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 1360),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final compact = constraints.maxWidth < 900;
+              final compact = constraints.maxWidth < _Breakpoints.navCompact;
 
               return Padding(
                 padding: EdgeInsets.symmetric(
@@ -95,50 +116,84 @@ class _Header extends StatelessWidget {
                   vertical: compact ? 18 : 14,
                 ),
                 child: compact
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ? Row(
                         children: [
-                          _Brand(onTap: () => _goHome(context)),
-                          SizedBox(height: 18),
-                          Wrap(
-                            spacing: 18,
-                            runSpacing: 14,
-                            children: [
-                              _NavItem(
+                          Expanded(child: _Brand(onTap: () => _goHome(context))),
+                          PopupMenuButton<_HeaderMenuAction>(
+                            tooltip: 'Open menu',
+                            color: AppColors.surface,
+                            surfaceTintColor: AppColors.surface,
+                            elevation: 8,
+                            position: PopupMenuPosition.under,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              side: const BorderSide(color: AppColors.border),
+                            ),
+                            icon: Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceMuted,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Icon(
+                                Icons.menu_rounded,
+                                color: AppColors.primary,
+                                size: 24,
+                              ),
+                            ),
+                            onSelected: (action) {
+                              switch (action) {
+                                case _HeaderMenuAction.home:
+                                  _goHome(context);
+                                case _HeaderMenuAction.about:
+                                  _goAbout(context);
+                                case _HeaderMenuAction.howItWorks:
+                                  _goHome(context);
+                                case _HeaderMenuAction.professionals:
+                                  _goProfessionals(context);
+                                case _HeaderMenuAction.faq:
+                                  _goFaq(context);
+                                case _HeaderMenuAction.contact:
+                                  _goContact(context);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              _mobileMenuItem(
                                 label: 'Home',
+                                value: _HeaderMenuAction.home,
                                 active: selectedNav == _NavDestination.home,
-                                onTap: () => _goHome(context),
                               ),
-                              _NavItem(
+                              _mobileMenuItem(
                                 label: 'About',
+                                value: _HeaderMenuAction.about,
                                 active: selectedNav == _NavDestination.about,
-                                onTap: () => _goAbout(context),
                               ),
-                              _NavItem(
+                              _mobileMenuItem(
                                 label: 'How it works',
-                                onTap: () => _goHome(context),
+                                value: _HeaderMenuAction.howItWorks,
                               ),
-                              _NavItem(
+                              _mobileMenuItem(
                                 label: 'For Professionals',
+                                value: _HeaderMenuAction.professionals,
                                 active:
                                     selectedNav ==
                                     _NavDestination.professionals,
-                                onTap: () => _goProfessionals(context),
                               ),
-                              _NavItem(
+                              _mobileMenuItem(
                                 label: 'FAQ',
+                                value: _HeaderMenuAction.faq,
                                 active: selectedNav == _NavDestination.faq,
-                                onTap: () => _goFaq(context),
                               ),
-                              _NavItem(
+                              _mobileMenuItem(
                                 label: 'Contact Us',
+                                value: _HeaderMenuAction.contact,
                                 active: selectedNav == _NavDestination.contact,
-                                onTap: () => _goContact(context),
                               ),
                             ],
                           ),
-                          SizedBox(height: 18),
-                          _GetAppButton(),
                         ],
                       )
                     : Row(
@@ -236,6 +291,24 @@ class _Header extends StatelessWidget {
       return;
     }
     Navigator.of(context).pushReplacementNamed(contactRoute);
+  }
+
+  PopupMenuItem<_HeaderMenuAction> _mobileMenuItem({
+    required String label,
+    required _HeaderMenuAction value,
+    bool active = false,
+  }) {
+    return PopupMenuItem<_HeaderMenuAction>(
+      value: value,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: AppColors.primary,
+          fontSize: 15,
+          fontWeight: active ? FontWeight.w900 : FontWeight.w700,
+        ),
+      ),
+    );
   }
 }
 
@@ -376,7 +449,11 @@ class _HeroSection extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 1240),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final wide = constraints.maxWidth >= 980;
+              final wide = constraints.maxWidth >= _Breakpoints.heroWide;
+              final compactButtons =
+                  constraints.maxWidth < _Breakpoints.heroCompactActions;
+              final compactStats =
+                  constraints.maxWidth < _Breakpoints.heroCompactActions;
               final nearbyBadgeCount =
                   AppRemoteConfig.instance.nearbyBadgeCount;
 
@@ -406,42 +483,107 @@ class _HeroSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children: [
-                      StoreButton(
-                        icon: AppIcons.apple,
-                        upperLabel: 'Download on the',
-                        lowerLabel: 'App Store',
-                      ),
-                      StoreButton(
-                        icon: AppIcons.googlePlay,
-                        upperLabel: 'Get it on',
-                        lowerLabel: 'Google Play',
-                      ),
-                    ],
-                  ),
+                  compactButtons
+                      ? Row(
+                          children: const [
+                            Expanded(
+                              child: StoreButton(
+                                icon: AppIcons.apple,
+                                upperLabel: 'Download on the',
+                                lowerLabel: 'App Store',
+                                compact: true,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: StoreButton(
+                                icon: AppIcons.googlePlay,
+                                upperLabel: 'Get it on',
+                                lowerLabel: 'Google Play',
+                                compact: true,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children: const [
+                            StoreButton(
+                              icon: AppIcons.apple,
+                              upperLabel: 'Download on the',
+                              lowerLabel: 'App Store',
+                            ),
+                            StoreButton(
+                              icon: AppIcons.googlePlay,
+                              upperLabel: 'Get it on',
+                              lowerLabel: 'Google Play',
+                            ),
+                          ],
+                        ),
                   const SizedBox(height: 24),
-                  Wrap(
-                    spacing: 14,
-                    runSpacing: 14,
-                    children: [
-                      _StatCard(
-                        title: 'Nearby',
-                        body: 'professionals',
-                        badgeText: nearbyBadgeCount != null
-                            ? '+$nearbyBadgeCount'
-                            : null,
-                      ),
-                      _StatCard(title: 'Paid', body: 'deeper sessions'),
-                      _StatCard(title: 'Free', body: 'coffee chats'),
-                    ],
-                  ),
+                  compactStats
+                      ? Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            SizedBox(
+                              width: (constraints.maxWidth - 12) / 2,
+                              child: _StatCard(
+                                title: 'Nearby',
+                                body: 'professionals',
+                                badgeText: nearbyBadgeCount != null
+                                    ? '+$nearbyBadgeCount'
+                                    : null,
+                                compact: true,
+                              ),
+                            ),
+                            SizedBox(
+                              width: (constraints.maxWidth - 12) / 2,
+                              child: const _StatCard(
+                                title: 'Paid',
+                                body: 'deeper sessions',
+                                compact: true,
+                              ),
+                            ),
+                            SizedBox(
+                              width: (constraints.maxWidth - 12) / 2,
+                              child: const _StatCard(
+                                title: 'Free',
+                                body: 'coffee chats',
+                                compact: true,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Wrap(
+                          spacing: 14,
+                          runSpacing: 14,
+                          children: [
+                            _StatCard(
+                              title: 'Nearby',
+                              body: 'professionals',
+                              badgeText: nearbyBadgeCount != null
+                                  ? '+$nearbyBadgeCount'
+                                  : null,
+                            ),
+                            const _StatCard(
+                              title: 'Paid',
+                              body: 'deeper sessions',
+                            ),
+                            const _StatCard(
+                              title: 'Free',
+                              body: 'coffee chats',
+                            ),
+                          ],
+                        ),
                 ],
               );
 
-              final visual = const _PhoneShowcase();
+              final visual = _PhoneShowcase(
+                compactVisual:
+                    constraints.maxWidth < _Breakpoints.heroShowcaseCompact,
+              );
 
               return wide
                   ? Row(
@@ -454,7 +596,14 @@ class _HeroSection extends StatelessWidget {
                     )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [copy, const SizedBox(height: 36), visual],
+                      children: [
+                        copy,
+                        const SizedBox(height: 36),
+                        Align(
+                          alignment: Alignment.center,
+                          child: visual,
+                        ),
+                      ],
                     );
             },
           ),
@@ -465,17 +614,23 @@ class _HeroSection extends StatelessWidget {
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({required this.title, required this.body, this.badgeText});
+  const _StatCard({
+    required this.title,
+    required this.body,
+    this.badgeText,
+    this.compact = false,
+  });
 
   final String title;
   final String body;
   final String? badgeText;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 184,
-      padding: const EdgeInsets.all(18),
+      width: compact ? null : 184,
+      padding: EdgeInsets.all(compact ? 16 : 18),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
@@ -496,18 +651,18 @@ class _StatCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.primary,
-                  fontSize: 28,
+                  fontSize: compact ? 22 : 28,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 body,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textMuted,
-                  fontSize: 18,
+                  fontSize: compact ? 16 : 18,
                   height: 1.25,
                 ),
               ),
@@ -518,8 +673,8 @@ class _StatCard extends StatelessWidget {
               top: -6,
               right: -2,
               child: Container(
-                width: 44,
-                height: 44,
+                width: compact ? 38 : 44,
+                height: compact ? 38 : 44,
                 decoration: const BoxDecoration(
                   color: AppColors.secondary,
                   shape: BoxShape.circle,
@@ -527,9 +682,9 @@ class _StatCard extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   badgeText!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.primary,
-                    fontSize: 13,
+                    fontSize: compact ? 11 : 13,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.3,
                   ),
@@ -543,106 +698,136 @@ class _StatCard extends StatelessWidget {
 }
 
 class _PhoneShowcase extends StatelessWidget {
-  const _PhoneShowcase();
+  const _PhoneShowcase({this.compactVisual = false});
+
+  final bool compactVisual;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 680,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            bottom: 0,
-            child: Container(
-              width: 470,
-              height: 470,
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(
-                  255,
-                  237,
-                  241,
-                  103,
-                ).withValues(alpha: 0.62),
-                shape: BoxShape.circle,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x40D5DF51),
-                    blurRadius: 70,
-                    spreadRadius: 8,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 340,
-            height: 636,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                const Positioned(
-                  left: 6,
-                  top: 128,
-                  child: _PhoneSideButton(height: 34, width: 6),
-                ),
-                const Positioned(
-                  left: 6,
-                  top: 182,
-                  child: _PhoneSideButton(height: 64, width: 6),
-                ),
-                const Positioned(
-                  left: 6,
-                  top: 262,
-                  child: _PhoneSideButton(height: 64, width: 6),
-                ),
-                const Positioned(
-                  right: 6,
-                  top: 208,
-                  child: _PhoneSideButton(height: 92, width: 6),
-                ),
-                Container(
-                  width: 324,
-                  height: 636,
-                  padding: const EdgeInsets.all(4),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const baseFrameWidth = 340.0;
+        const baseFrameHeight = 636.0;
+        final availableWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : baseFrameWidth;
+        final compact = compactVisual || availableWidth < _Breakpoints.phoneCompact;
+        final scale = compact
+            ? (availableWidth / baseFrameWidth).clamp(0.82, 1.0)
+            : 1.0;
+        final frameWidth = baseFrameWidth * scale;
+        final frameHeight = baseFrameHeight * scale;
+        final stageHeight = compact ? frameHeight + 56 : 680.0;
+        final glowSize = compact ? 300.0 * scale : 470.0;
+        final glowBottom = compact ? 8.0 : 0.0;
+
+        return SizedBox(
+          height: stageHeight,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                bottom: glowBottom,
+                child: Container(
+                  width: glowSize,
+                  height: glowSize,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1C1A18),
-                    borderRadius: BorderRadius.circular(52),
-                    border: Border.all(
-                      color: const Color(0xFFB7792D),
-                      width: 2.6,
-                    ),
-                    boxShadow: const [
+                    color: const Color.fromARGB(
+                      255,
+                      237,
+                      241,
+                      103,
+                    ).withValues(alpha: compact ? 0.36 : 0.62),
+                    shape: BoxShape.circle,
+                    boxShadow: [
                       BoxShadow(
-                        color: Color(0x4D000000),
-                        blurRadius: 42,
-                        offset: Offset(18, 26),
+                        color: const Color(0x40D5DF51).withValues(
+                          alpha: compact ? 0.22 : 0.36,
+                        ),
+                        blurRadius: compact ? 36 : 70,
+                        spreadRadius: compact ? 0 : 8,
                       ),
                     ],
                   ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(44),
-                    ),
-                    child: Stack(
-                      children: const [
-                        Positioned.fill(child: _PhoneScreen()),
-                        Positioned(
-                          top: 14,
-                          left: 0,
-                          right: 0,
-                          child: Center(child: _PhoneNotch()),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(
+                width: frameWidth,
+                height: frameHeight,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (!compact) ...const [
+                      Positioned(
+                        left: 6,
+                        top: 128,
+                        child: _PhoneSideButton(height: 34, width: 6),
+                      ),
+                      Positioned(
+                        left: 6,
+                        top: 182,
+                        child: _PhoneSideButton(height: 64, width: 6),
+                      ),
+                      Positioned(
+                        left: 6,
+                        top: 262,
+                        child: _PhoneSideButton(height: 64, width: 6),
+                      ),
+                      Positioned(
+                        right: 6,
+                        top: 208,
+                        child: _PhoneSideButton(height: 92, width: 6),
+                      ),
+                    ],
+                    Container(
+                      width: 324 * scale,
+                      height: frameHeight,
+                      padding: EdgeInsets.all(4 * scale),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1C1A18),
+                        borderRadius: BorderRadius.circular(52 * scale),
+                        border: Border.all(
+                          color: const Color(0xFFB7792D),
+                          width: compact ? 1.8 : 2.6,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0x4D000000).withValues(
+                              alpha: compact ? 0.18 : 0.30,
+                            ),
+                            blurRadius: compact ? 18 : 42,
+                            offset: Offset(
+                              compact ? 0 : 18,
+                              compact ? 12 : 26,
+                            ),
+                          ),
+                        ],
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(44 * scale),
+                        ),
+                        child: Stack(
+                          children: [
+                            const Positioned.fill(child: _PhoneScreen()),
+                            Positioned(
+                              top: 14 * scale,
+                              left: 0,
+                              right: 0,
+                              child: const Center(child: _PhoneNotch()),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -784,8 +969,8 @@ class _AboutSection extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 1240),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final isWide = constraints.maxWidth >= 1040;
-              final isMedium = constraints.maxWidth >= 720;
+              final isWide = constraints.maxWidth >= _Breakpoints.lg;
+              final isMedium = constraints.maxWidth >= _Breakpoints.md;
 
               Widget cardsLayout;
               if (isWide) {
@@ -988,8 +1173,8 @@ class _ProfessionalsHeroSection extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 1240),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final isWide = constraints.maxWidth >= 1040;
-              final isMedium = constraints.maxWidth >= 720;
+              final isWide = constraints.maxWidth >= _Breakpoints.lg;
+              final isMedium = constraints.maxWidth >= _Breakpoints.md;
 
               Widget cardsLayout;
               if (isWide) {
@@ -1244,8 +1429,8 @@ class _FaqSection extends StatelessWidget {
               const SizedBox(height: 44),
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final isWide = constraints.maxWidth >= 1040;
-                  final isMedium = constraints.maxWidth >= 720;
+                  final isWide = constraints.maxWidth >= _Breakpoints.lg;
+                  final isMedium = constraints.maxWidth >= _Breakpoints.md;
 
                   if (isWide) {
                     return Wrap(
@@ -1532,7 +1717,7 @@ class _ContactSection extends StatelessWidget {
                     'Questions, support, or partnership enquiries.',
                     style: TextStyle(
                       color: AppColors.primary,
-                      fontSize: constraints.maxWidth >= 1040 ? 64 : 44,
+                      fontSize: constraints.maxWidth >= _Breakpoints.lg ? 64 : 44,
                       height: 1.02,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -1.8,
@@ -1706,7 +1891,14 @@ class _HowItWorksSection extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final isWide = constraints.maxWidth > 980;
+                  final isWide = constraints.maxWidth > _Breakpoints.heroWide;
+                  final isMedium =
+                      constraints.maxWidth > _Breakpoints.howItWorksGrid;
+                  final cardMinHeight = isWide
+                      ? 232.0
+                      : isMedium
+                      ? 188.0
+                      : 156.0;
 
                   final intro = const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1756,11 +1948,28 @@ class _HowItWorksSection extends StatelessWidget {
                                     number: '${index + 1}',
                                     title: steps[index].title,
                                     body: steps[index].body,
+                                    minHeight: cardMinHeight,
                                   ),
                                 ),
                               );
                             }),
                           ),
+                        )
+                      : isMedium
+                      ? Wrap(
+                          spacing: 18,
+                          runSpacing: 18,
+                          children: List.generate(steps.length, (index) {
+                            return SizedBox(
+                              width: (constraints.maxWidth - 18) / 2,
+                              child: _StepCard(
+                                number: '${index + 1}',
+                                title: steps[index].title,
+                                body: steps[index].body,
+                                minHeight: cardMinHeight,
+                              ),
+                            );
+                          }),
                         )
                       : Column(
                           children: List.generate(steps.length, (index) {
@@ -1772,6 +1981,7 @@ class _HowItWorksSection extends StatelessWidget {
                                 number: '${index + 1}',
                                 title: steps[index].title,
                                 body: steps[index].body,
+                                minHeight: cardMinHeight,
                               ),
                             );
                           }),
@@ -1800,15 +2010,20 @@ class _StepCard extends StatelessWidget {
     required this.number,
     required this.title,
     required this.body,
+    required this.minHeight,
   });
 
   final String number;
   final String title;
   final String body;
+  final double minHeight;
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < _Breakpoints.lg;
+
     return Container(
+      constraints: BoxConstraints(minHeight: minHeight),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -1825,34 +2040,69 @@ class _StepCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              number,
+          compact
+              ? Row(
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        number,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 18,
+                          height: 1.1,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    number,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+          SizedBox(height: compact ? 8 : 20),
+          if (!compact)
+            Text(
+              title,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.primary,
                 fontSize: 18,
-                fontWeight: FontWeight.w900,
+                height: 1.1,
+                fontWeight: FontWeight.w800,
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 18,
-              height: 1.1,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 12),
+          SizedBox(height: compact ? 6 : 12),
           Text(
             body,
             style: const TextStyle(
@@ -1879,7 +2129,8 @@ class _ForProfessionalsSection extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 1240),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final stacked = constraints.maxWidth < 930;
+              final stacked =
+                  constraints.maxWidth < _Breakpoints.professionalsStack;
 
               final content = Container(
                 padding: const EdgeInsets.all(30),
@@ -2118,7 +2369,8 @@ class _Footer extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 1240),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final compact = constraints.maxWidth < 900;
+                final compact =
+                    constraints.maxWidth < _Breakpoints.navCompact;
 
                 final brandBlock = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

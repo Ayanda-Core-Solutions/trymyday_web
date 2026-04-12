@@ -9,24 +9,29 @@ class StoreButton extends StatelessWidget {
     required this.icon,
     required this.upperLabel,
     required this.lowerLabel,
+    this.compact = false,
   });
 
   final IconData icon;
   final String upperLabel;
   final String lowerLabel;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    const upperFontSize = 11.0;
-    const lowerFontSize = 21.0;
-    const iconSlotSize = lowerFontSize + 15;
+    final upperFontSize = compact ? 9.5 : 11.0;
+    final lowerFontSize = compact ? 16.0 : 21.0;
+    final iconSlotSize = lowerFontSize + (compact ? 10 : 15);
     final iconSize = _iconScale(icon) * iconSlotSize;
     final iconWidget = icon.fontPackage == 'font_awesome_flutter'
         ? FaIcon(icon, color: Colors.white, size: iconSize)
         : Icon(icon, color: Colors.white, size: iconSize);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 12 : 18,
+        vertical: compact ? 12 : 14,
+      ),
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(18),
@@ -46,7 +51,7 @@ class StoreButton extends StatelessWidget {
             height: iconSlotSize,
             child: Center(child: iconWidget),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: compact ? 10 : 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -61,7 +66,7 @@ class StoreButton extends StatelessWidget {
               ),
               Text(
                 lowerLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontSize: lowerFontSize,
                   fontWeight: FontWeight.w800,
