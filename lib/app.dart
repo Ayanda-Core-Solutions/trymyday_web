@@ -26,7 +26,14 @@ class TryMyDayApp extends StatelessWidget {
           displayColor: AppColors.textPrimary,
         ),
       ),
-      home: const HomePage(),
+      initialRoute: homeRoute,
+      routes: {
+        homeRoute: (context) => const HomePage(),
+        aboutRoute: (context) => const AboutPage(),
+        faqRoute: (context) => const FaqPage(),
+        contactRoute: (context) => const ContactPage(),
+        professionalsRoute: (context) => const ProfessionalsPage(),
+      },
     );
   }
 }

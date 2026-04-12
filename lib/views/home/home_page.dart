@@ -7,6 +7,17 @@ import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_icons.dart';
 import '../../core/utils/app_images.dart';
 
+part 'about_page.dart';
+part 'contact_page.dart';
+part 'faq_page.dart';
+part 'professionals_page.dart';
+
+const String homeRoute = '/';
+const String aboutRoute = '/about';
+const String faqRoute = '/faq';
+const String contactRoute = '/contact';
+const String professionalsRoute = '/professionals';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -33,7 +44,7 @@ class _LandingPage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: const [
-              _Header(),
+              _Header(selectedNav: _NavDestination.home),
               _HeroSection(),
               _HowItWorksSection(),
               _ForProfessionalsSection(),
@@ -46,8 +57,12 @@ class _LandingPage extends StatelessWidget {
   }
 }
 
+enum _NavDestination { home, about, faq, contact, professionals }
+
 class _Header extends StatelessWidget {
-  const _Header();
+  const _Header({required this.selectedNav});
+
+  final _NavDestination selectedNav;
 
   @override
   Widget build(BuildContext context) {
@@ -80,42 +95,95 @@ class _Header extends StatelessWidget {
                   vertical: compact ? 18 : 14,
                 ),
                 child: compact
-                    ? const Column(
+                    ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _Brand(),
+                          _Brand(onTap: () => _goHome(context)),
                           SizedBox(height: 18),
                           Wrap(
                             spacing: 18,
                             runSpacing: 14,
                             children: [
-                              _NavItem(label: 'About'),
-                              _NavItem(label: 'How it works'),
-                              _NavItem(label: 'For Professionals'),
-                              _NavItem(label: 'FAQ'),
-                              _NavItem(label: 'Contact Us'),
+                              _NavItem(
+                                label: 'Home',
+                                active: selectedNav == _NavDestination.home,
+                                onTap: () => _goHome(context),
+                              ),
+                              _NavItem(
+                                label: 'About',
+                                active: selectedNav == _NavDestination.about,
+                                onTap: () => _goAbout(context),
+                              ),
+                              _NavItem(
+                                label: 'How it works',
+                                onTap: () => _goHome(context),
+                              ),
+                              _NavItem(
+                                label: 'For Professionals',
+                                active:
+                                    selectedNav ==
+                                    _NavDestination.professionals,
+                                onTap: () => _goProfessionals(context),
+                              ),
+                              _NavItem(
+                                label: 'FAQ',
+                                active: selectedNav == _NavDestination.faq,
+                                onTap: () => _goFaq(context),
+                              ),
+                              _NavItem(
+                                label: 'Contact Us',
+                                active: selectedNav == _NavDestination.contact,
+                                onTap: () => _goContact(context),
+                              ),
                             ],
                           ),
                           SizedBox(height: 18),
                           _GetAppButton(),
                         ],
                       )
-                    : const Row(
+                    : Row(
                         children: [
-                          _Brand(),
+                          _Brand(onTap: () => _goHome(context)),
                           Spacer(),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              _NavItem(label: 'About'),
+                              _NavItem(
+                                label: 'Home',
+                                active: selectedNav == _NavDestination.home,
+                                onTap: () => _goHome(context),
+                              ),
                               SizedBox(width: 36),
-                              _NavItem(label: 'How it works'),
+                              _NavItem(
+                                label: 'About',
+                                active: selectedNav == _NavDestination.about,
+                                onTap: () => _goAbout(context),
+                              ),
                               SizedBox(width: 36),
-                              _NavItem(label: 'For Professionals'),
+                              _NavItem(
+                                label: 'How it works',
+                                onTap: () => _goHome(context),
+                              ),
                               SizedBox(width: 36),
-                              _NavItem(label: 'FAQ'),
+                              _NavItem(
+                                label: 'For Professionals',
+                                active:
+                                    selectedNav ==
+                                    _NavDestination.professionals,
+                                onTap: () => _goProfessionals(context),
+                              ),
                               SizedBox(width: 36),
-                              _NavItem(label: 'Contact Us'),
+                              _NavItem(
+                                label: 'FAQ',
+                                active: selectedNav == _NavDestination.faq,
+                                onTap: () => _goFaq(context),
+                              ),
+                              SizedBox(width: 36),
+                              _NavItem(
+                                label: 'Contact Us',
+                                active: selectedNav == _NavDestination.contact,
+                                onTap: () => _goContact(context),
+                              ),
                             ],
                           ),
                           SizedBox(width: 42),
@@ -129,14 +197,63 @@ class _Header extends StatelessWidget {
       ),
     );
   }
+
+  void _goHome(BuildContext context) {
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    if (currentRoute == homeRoute || currentRoute == null) {
+      return;
+    }
+    Navigator.of(context).pushReplacementNamed(homeRoute);
+  }
+
+  void _goAbout(BuildContext context) {
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    if (currentRoute == aboutRoute) {
+      return;
+    }
+    Navigator.of(context).pushReplacementNamed(aboutRoute);
+  }
+
+  void _goProfessionals(BuildContext context) {
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    if (currentRoute == professionalsRoute) {
+      return;
+    }
+    Navigator.of(context).pushReplacementNamed(professionalsRoute);
+  }
+
+  void _goFaq(BuildContext context) {
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    if (currentRoute == faqRoute) {
+      return;
+    }
+    Navigator.of(context).pushReplacementNamed(faqRoute);
+  }
+
+  void _goContact(BuildContext context) {
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    if (currentRoute == contactRoute) {
+      return;
+    }
+    Navigator.of(context).pushReplacementNamed(contactRoute);
+  }
 }
 
 class _Brand extends StatelessWidget {
-  const _Brand();
+  const _Brand({this.onTap});
+
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return const _BrandLockup();
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: const Padding(
+        padding: EdgeInsets.symmetric(vertical: 4),
+        child: _BrandLockup(),
+      ),
+    );
   }
 }
 
@@ -195,18 +312,30 @@ class _BrandLockup extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  const _NavItem({required this.label});
+  const _NavItem({required this.label, this.active = false, this.onTap});
 
   final String label;
+  final bool active;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: const TextStyle(
-        color: AppColors.primary,
-        fontSize: 14,
-        fontWeight: FontWeight.w800,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            decoration: active ? TextDecoration.underline : null,
+            decorationColor: AppColors.primary,
+            decorationThickness: 2,
+          ),
+        ),
       ),
     );
   }
@@ -617,6 +746,920 @@ class _PhoneScreen extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AboutSection extends StatelessWidget {
+  const _AboutSection();
+
+  @override
+  Widget build(BuildContext context) {
+    const cards = [
+      (
+        icon: Icons.gps_fixed_rounded,
+        title: 'Our mission',
+        body:
+            'Make quality career insight easier to reach by connecting curiosity with lived professional experience.',
+      ),
+      (
+        icon: Icons.handshake_outlined,
+        title: 'Our Promise',
+        body:
+            'Real professionals. Real conversations. Real context for the decisions people make about their future.',
+      ),
+      (
+        icon: Icons.groups_2_outlined,
+        title: 'Who it’s for',
+        body:
+            'Students, graduates, career switchers, and anyone who needs clarity before making their next move.',
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 28, 24, 72),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1240),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 1040;
+              final isMedium = constraints.maxWidth >= 720;
+
+              Widget cardsLayout;
+              if (isWide) {
+                cardsLayout = IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: List.generate(cards.length, (index) {
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            right: index == cards.length - 1 ? 0 : 18,
+                          ),
+                          child: _AboutCard(
+                            icon: cards[index].icon,
+                            title: cards[index].title,
+                            body: cards[index].body,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              } else if (isMedium) {
+                cardsLayout = Wrap(
+                  spacing: 18,
+                  runSpacing: 18,
+                  children: cards
+                      .map(
+                        (card) => SizedBox(
+                          width: (constraints.maxWidth - 18) / 2,
+                          child: _AboutCard(
+                            icon: card.icon,
+                            title: card.title,
+                            body: card.body,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                );
+              } else {
+                cardsLayout = Column(
+                  children: List.generate(cards.length, (index) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: index == cards.length - 1 ? 0 : 18,
+                      ),
+                      child: _AboutCard(
+                        icon: cards[index].icon,
+                        title: cards[index].title,
+                        body: cards[index].body,
+                      ),
+                    );
+                  }),
+                );
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'About TryMyDay',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Helping people access the kind of advice that changes direction.',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: isWide ? 64 : 44,
+                      height: 1.02,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -1.8,
+                    ),
+                  ),
+                  const SizedBox(height: 26),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1120),
+                    child: const Text(
+                      'TryMyDay exists to make career guidance more human, more accessible, and more practical. Instead of guessing what a role is really like, users can connect directly with professionals and hear it from someone doing the work.',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 19,
+                        height: 1.55,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 38),
+                  cardsLayout,
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AboutCard extends StatelessWidget {
+  const _AboutCard({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(36),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.border),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 18,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 108,
+            height: 108,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(32),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: Colors.white, size: 46),
+          ),
+          const SizedBox(height: 28),
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            body,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 18,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfessionalsHeroSection extends StatelessWidget {
+  const _ProfessionalsHeroSection();
+
+  @override
+  Widget build(BuildContext context) {
+    const cards = [
+      (
+        icon: Icons.badge_outlined,
+        title: 'Build your profile',
+        body:
+            'Add your role, company, experience, highlights, and certifications to create trust.',
+        highlighted: false,
+      ),
+      (
+        icon: Icons.schedule_outlined,
+        title: 'Set availability',
+        body:
+            'Create session windows, choose session type, set location, and define your hourly rate.',
+        highlighted: false,
+      ),
+      (
+        icon: Icons.paid_outlined,
+        title: 'Earn while giving back',
+        body:
+            'Use free coffee chats for quick discovery and paid sessions for more focused mentorship.',
+        highlighted: false,
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 28, 24, 72),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1240),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 1040;
+              final isMedium = constraints.maxWidth >= 720;
+
+              Widget cardsLayout;
+              if (isWide) {
+                cardsLayout = IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: List.generate(cards.length, (index) {
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            right: index == cards.length - 1 ? 0 : 18,
+                          ),
+                          child: _ProfessionalFeatureCard(
+                            icon: cards[index].icon,
+                            title: cards[index].title,
+                            body: cards[index].body,
+                            highlighted: cards[index].highlighted,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              } else if (isMedium) {
+                cardsLayout = Wrap(
+                  spacing: 18,
+                  runSpacing: 18,
+                  children: cards
+                      .map(
+                        (card) => SizedBox(
+                          width: (constraints.maxWidth - 18) / 2,
+                          child: _ProfessionalFeatureCard(
+                            icon: card.icon,
+                            title: card.title,
+                            body: card.body,
+                            highlighted: card.highlighted,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                );
+              } else {
+                cardsLayout = Column(
+                  children: List.generate(cards.length, (index) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: index == cards.length - 1 ? 0 : 18,
+                      ),
+                      child: _ProfessionalFeatureCard(
+                        icon: cards[index].icon,
+                        title: cards[index].title,
+                        body: cards[index].body,
+                        highlighted: cards[index].highlighted,
+                      ),
+                    );
+                  }),
+                );
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'For Professionals',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Share your experience. Help someone move forward.',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: isWide ? 64 : 44,
+                      height: 1.02,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -1.8,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1180),
+                    child: const Text(
+                      'Professionals can create profiles, set availability, offer quick coffee chats, and earn from paid sessions. This page is designed to feel credible and light, with enough structure to reassure busy experts that the platform is easy to manage.',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 19,
+                        height: 1.55,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 44),
+                  cardsLayout,
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfessionalFeatureCard extends StatelessWidget {
+  const _ProfessionalFeatureCard({
+    required this.icon,
+    required this.title,
+    required this.body,
+    required this.highlighted,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+  final bool highlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(36),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: highlighted ? const Color(0xFF2495F1) : AppColors.border,
+          width: highlighted ? 4 : 1,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 18,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 108,
+            height: 108,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(32),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: Colors.white, size: 46),
+          ),
+          const SizedBox(height: 28),
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            body,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 18,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FaqSection extends StatelessWidget {
+  const _FaqSection();
+
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      (
+        question: 'What is a free coffee chat?',
+        answer:
+            'A short casual video or voice conversation that helps you ask quick questions before committing to a paid session.',
+      ),
+      (
+        question: 'How do I book a paid session?',
+        answer:
+            'Search for a professional, open their profile, review their availability, then select a paid booking option.',
+      ),
+      (
+        question: 'Can I reschedule a session?',
+        answer:
+            'Yes, your activity and schedule areas are designed to support rescheduling where the booking terms allow it.',
+      ),
+      (
+        question: 'Do professionals set their own rates?',
+        answer:
+            'Yes. Professionals can define their rates and availability from their side of the platform.',
+      ),
+      (
+        question: 'How do I join a session?',
+        answer:
+            'When it’s time, go to your schedule area and tap into the session room.',
+      ),
+      (
+        question: 'Can I book the same professional again?',
+        answer:
+            'Yes, the activity history encourages repeat bookings for ongoing mentorship and support.',
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 28, 24, 72),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1240),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'FAQ',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Helpful answers before you book.',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 64,
+                  height: 1.02,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1.8,
+                ),
+              ),
+              const SizedBox(height: 28),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1080),
+                child: const Text(
+                  'Aligned to the app’s booking, profile, coffee chat, scheduling, and payment patterns.',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 19,
+                    height: 1.55,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 44),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth >= 1040;
+                  final isMedium = constraints.maxWidth >= 720;
+
+                  if (isWide) {
+                    return Wrap(
+                      spacing: 24,
+                      runSpacing: 24,
+                      children: items
+                          .map(
+                            (item) => SizedBox(
+                              width: (constraints.maxWidth - 48) / 3,
+                              child: _FaqCard(
+                                question: item.question,
+                                answer: item.answer,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    );
+                  }
+
+                  if (isMedium) {
+                    return Wrap(
+                      spacing: 18,
+                      runSpacing: 18,
+                      children: items
+                          .map(
+                            (item) => SizedBox(
+                              width: (constraints.maxWidth - 18) / 2,
+                              child: _FaqCard(
+                                question: item.question,
+                                answer: item.answer,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    );
+                  }
+
+                  return Column(
+                    children: items
+                        .map(
+                          (item) => Padding(
+                            padding: const EdgeInsets.only(bottom: 18),
+                            child: _FaqCard(
+                              question: item.question,
+                              answer: item.answer,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FaqCard extends StatefulWidget {
+  const _FaqCard({required this.question, required this.answer});
+
+  final String question;
+  final String answer;
+
+  @override
+  State<_FaqCard> createState() => _FaqCardState();
+}
+
+class _FaqCardState extends State<_FaqCard> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(22),
+        onTap: () => setState(() => _expanded = !_expanded),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: AppColors.border),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.shadow,
+                blurRadius: 18,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 68,
+                    height: 68,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      '?',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 38,
+                        fontWeight: FontWeight.w300,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 18),
+                  Expanded(
+                    child: Text(
+                      widget.question,
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  AnimatedRotation(
+                    turns: _expanded ? 0.125 : 0,
+                    duration: const Duration(milliseconds: 220),
+                    child: Icon(
+                      _expanded ? Icons.close_rounded : Icons.add_rounded,
+                      color: AppColors.primary,
+                      size: 26,
+                    ),
+                  ),
+                ],
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+                alignment: Alignment.topCenter,
+                child: _expanded
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 22),
+                        child: Text(
+                          widget.answer,
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 18,
+                            height: 1.45,
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ContactSection extends StatelessWidget {
+  const _ContactSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 28, 24, 72),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1240),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final stacked = constraints.maxWidth < 980;
+
+              final formCard = Expanded(
+                flex: stacked ? 0 : 8,
+                child: Container(
+                  padding: const EdgeInsets.all(44),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: AppColors.border),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: AppColors.shadow,
+                        blurRadius: 18,
+                        offset: Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Send us a message',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      _ContactFieldLabel(label: 'Name'),
+                      SizedBox(height: 10),
+                      _ContactInput(hintText: 'Your full name'),
+                      SizedBox(height: 22),
+                      _ContactFieldLabel(label: 'Email'),
+                      SizedBox(height: 10),
+                      _ContactInput(hintText: 'you@example.com'),
+                      SizedBox(height: 22),
+                      _ContactFieldLabel(label: 'How can we help?'),
+                      SizedBox(height: 10),
+                      _ContactInput(hintText: 'Tell us more...', maxLines: 5),
+                      SizedBox(height: 18),
+                      _ContactSubmitButton(),
+                    ],
+                  ),
+                ),
+              );
+
+              final topicsCard = Expanded(
+                flex: stacked ? 0 : 4,
+                child: Container(
+                  padding: const EdgeInsets.all(36),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: AppColors.border),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: AppColors.shadow,
+                        blurRadius: 18,
+                        offset: Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Support topics',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      _SupportTopic(text: 'Booking issues'),
+                      SizedBox(height: 14),
+                      _SupportTopic(text: 'Account and profile help'),
+                      SizedBox(height: 14),
+                      _SupportTopic(text: 'Payments and refunds'),
+                      SizedBox(height: 14),
+                      _SupportTopic(text: 'Partnerships and media'),
+                    ],
+                  ),
+                ),
+              );
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Contact Us',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Questions, support, or partnership enquiries.',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: constraints.maxWidth >= 1040 ? 64 : 44,
+                      height: 1.02,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -1.8,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  const Text(
+                    'The contact page is designed to feel light, trustworthy, and easy to use.',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 19,
+                      height: 1.55,
+                    ),
+                  ),
+                  const SizedBox(height: 34),
+                  stacked
+                      ? Column(
+                          children: [
+                            formCard,
+                            const SizedBox(height: 24),
+                            topicsCard,
+                          ],
+                        )
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            formCard,
+                            const SizedBox(width: 28),
+                            topicsCard,
+                          ],
+                        ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ContactFieldLabel extends StatelessWidget {
+  const _ContactFieldLabel({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: const TextStyle(
+        color: AppColors.primary,
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+}
+
+class _ContactInput extends StatelessWidget {
+  const _ContactInput({required this.hintText, this.maxLines = 1});
+
+  final String hintText;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: const TextStyle(color: Color(0xFF6B7484), fontSize: 16),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: maxLines == 1 ? 16 : 20,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
+        ),
+      ),
+    );
+  }
+}
+
+class _ContactSubmitButton extends StatelessWidget {
+  const _ContactSubmitButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 52, vertical: 22),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Text(
+        'Submit',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+}
+
+class _SupportTopic extends StatelessWidget {
+  const _SupportTopic({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: AppColors.primary,
+        fontSize: 18,
+        height: 1.35,
       ),
     );
   }
