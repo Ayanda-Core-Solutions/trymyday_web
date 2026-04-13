@@ -351,7 +351,7 @@ class _Header extends StatelessWidget {
     if (currentRoute == homeRoute || currentRoute == null) {
       return;
     }
-    Navigator.of(context).pushReplacementNamed(homeRoute);
+    _replaceWithFade(context, const HomePage());
   }
 
   void _goAbout(BuildContext context) {
@@ -359,16 +359,18 @@ class _Header extends StatelessWidget {
     if (currentRoute == aboutRoute) {
       return;
     }
-    Navigator.of(context).pushReplacementNamed(aboutRoute);
+    _replaceWithFade(
+      context,
+      const AboutPage(),
+      routeName: aboutRoute,
+    );
   }
 
   void _goHowItWorks(BuildContext context) {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(
-        settings: const RouteSettings(name: homeRoute),
-        builder: (context) =>
-            const HomePage(initialTarget: HomeScrollTarget.howItWorks),
-      ),
+    _replaceWithFade(
+      context,
+      const HomePage(initialTarget: HomeScrollTarget.howItWorks),
+      routeName: homeRoute,
     );
   }
 
@@ -377,7 +379,11 @@ class _Header extends StatelessWidget {
     if (currentRoute == professionalsRoute) {
       return;
     }
-    Navigator.of(context).pushReplacementNamed(professionalsRoute);
+    _replaceWithFade(
+      context,
+      const ProfessionalsPage(),
+      routeName: professionalsRoute,
+    );
   }
 
   void _goFaq(BuildContext context) {
@@ -385,7 +391,11 @@ class _Header extends StatelessWidget {
     if (currentRoute == faqRoute) {
       return;
     }
-    Navigator.of(context).pushReplacementNamed(faqRoute);
+    _replaceWithFade(
+      context,
+      const FaqPage(),
+      routeName: faqRoute,
+    );
   }
 
   void _goContact(BuildContext context) {
@@ -393,7 +403,34 @@ class _Header extends StatelessWidget {
     if (currentRoute == contactRoute) {
       return;
     }
-    Navigator.of(context).pushReplacementNamed(contactRoute);
+    _replaceWithFade(
+      context,
+      const ContactPage(),
+      routeName: contactRoute,
+    );
+  }
+
+  void _replaceWithFade(
+    BuildContext context,
+    Widget page, {
+    String routeName = homeRoute,
+  }) {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder<void>(
+        settings: RouteSettings(name: routeName),
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionDuration: const Duration(milliseconds: 220),
+        reverseTransitionDuration: const Duration(milliseconds: 180),
+        transitionsBuilder: (
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+        ) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
   }
 
   PopupMenuItem<_HeaderMenuAction> _mobileMenuItem({
