@@ -44,6 +44,26 @@ class _LandingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return const _PageShell(
+      selectedNav: _NavDestination.home,
+      children: [
+        _HeroSection(),
+        _HowItWorksSection(),
+        _ForProfessionalsSection(),
+        _Footer(),
+      ],
+    );
+  }
+}
+
+class _PageShell extends StatelessWidget {
+  const _PageShell({required this.selectedNav, required this.children});
+
+  final _NavDestination selectedNav;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -53,16 +73,13 @@ class _LandingPage extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: const [
-              _Header(selectedNav: _NavDestination.home),
-              _HeroSection(),
-              _HowItWorksSection(),
-              _ForProfessionalsSection(),
-              _Footer(),
-            ],
-          ),
+        child: Column(
+          children: [
+            _Header(selectedNav: selectedNav),
+            Expanded(
+              child: SingleChildScrollView(child: Column(children: children)),
+            ),
+          ],
         ),
       ),
     );
@@ -71,14 +88,7 @@ class _LandingPage extends StatelessWidget {
 
 enum _NavDestination { home, about, faq, contact, professionals }
 
-enum _HeaderMenuAction {
-  home,
-  about,
-  howItWorks,
-  professionals,
-  faq,
-  contact,
-}
+enum _HeaderMenuAction { home, about, howItWorks, professionals, faq, contact }
 
 class _Header extends StatelessWidget {
   const _Header({required this.selectedNav});
@@ -109,6 +119,8 @@ class _Header extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final compact = constraints.maxWidth < _Breakpoints.navCompact;
+              final navSpacing = constraints.maxWidth < 1280 ? 20.0 : 36.0;
+              final actionGap = constraints.maxWidth < 1280 ? 24.0 : 42.0;
 
               return Padding(
                 padding: EdgeInsets.symmetric(
@@ -118,7 +130,12 @@ class _Header extends StatelessWidget {
                 child: compact
                     ? Row(
                         children: [
-                          Expanded(child: _Brand(onTap: () => _goHome(context))),
+                          Expanded(
+                            child: _Brand(
+                              key: const ValueKey('nav-brand'),
+                              onTap: () => _goHome(context),
+                            ),
+                          ),
                           PopupMenuButton<_HeaderMenuAction>(
                             tooltip: 'Open menu',
                             color: AppColors.surface,
@@ -198,51 +215,88 @@ class _Header extends StatelessWidget {
                       )
                     : Row(
                         children: [
-                          _Brand(onTap: () => _goHome(context)),
-                          Spacer(),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _NavItem(
-                                label: 'Home',
-                                active: selectedNav == _NavDestination.home,
-                                onTap: () => _goHome(context),
-                              ),
-                              SizedBox(width: 36),
-                              _NavItem(
-                                label: 'About',
-                                active: selectedNav == _NavDestination.about,
-                                onTap: () => _goAbout(context),
-                              ),
-                              SizedBox(width: 36),
-                              _NavItem(
-                                label: 'How it works',
-                                onTap: () => _goHome(context),
-                              ),
-                              SizedBox(width: 36),
-                              _NavItem(
-                                label: 'For Professionals',
-                                active:
-                                    selectedNav ==
-                                    _NavDestination.professionals,
-                                onTap: () => _goProfessionals(context),
-                              ),
-                              SizedBox(width: 36),
-                              _NavItem(
-                                label: 'FAQ',
-                                active: selectedNav == _NavDestination.faq,
-                                onTap: () => _goFaq(context),
-                              ),
-                              SizedBox(width: 36),
-                              _NavItem(
-                                label: 'Contact Us',
-                                active: selectedNav == _NavDestination.contact,
-                                onTap: () => _goContact(context),
-                              ),
-                            ],
+                          _Brand(
+                            key: const ValueKey('nav-brand'),
+                            onTap: () => _goHome(context),
                           ),
-                          SizedBox(width: 42),
-                          _GetAppButton(),
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerRight,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        _NavItem(
+                                          key: const ValueKey('nav-home'),
+                                          label: 'Home',
+                                          active:
+                                              selectedNav ==
+                                              _NavDestination.home,
+                                          onTap: () => _goHome(context),
+                                        ),
+                                        SizedBox(width: navSpacing),
+                                        _NavItem(
+                                          key: const ValueKey('nav-about'),
+                                          label: 'About',
+                                          active:
+                                              selectedNav ==
+                                              _NavDestination.about,
+                                          onTap: () => _goAbout(context),
+                                        ),
+                                        SizedBox(width: navSpacing),
+                                        _NavItem(
+                                          key: const ValueKey(
+                                            'nav-how-it-works',
+                                          ),
+                                          label: 'How it works',
+                                          onTap: () => _goHome(context),
+                                        ),
+                                        SizedBox(width: navSpacing),
+                                        _NavItem(
+                                          key: const ValueKey(
+                                            'nav-professionals',
+                                          ),
+                                          label: 'For Professionals',
+                                          active:
+                                              selectedNav ==
+                                              _NavDestination.professionals,
+                                          onTap: () => _goProfessionals(context),
+                                        ),
+                                        SizedBox(width: navSpacing),
+                                        _NavItem(
+                                          key: const ValueKey('nav-faq'),
+                                          label: 'FAQ',
+                                          active:
+                                              selectedNav ==
+                                              _NavDestination.faq,
+                                          onTap: () => _goFaq(context),
+                                        ),
+                                        SizedBox(width: navSpacing),
+                                        _NavItem(
+                                          key: const ValueKey('nav-contact'),
+                                          label: 'Contact Us',
+                                          active:
+                                              selectedNav ==
+                                              _NavDestination.contact,
+                                          onTap: () => _goContact(context),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(width: actionGap),
+                                    const _GetAppButton(
+                                      key: ValueKey('header-get-app'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
               );
@@ -313,7 +367,7 @@ class _Header extends StatelessWidget {
 }
 
 class _Brand extends StatelessWidget {
-  const _Brand({this.onTap});
+  const _Brand({super.key, this.onTap});
 
   final VoidCallback? onTap;
 
@@ -385,7 +439,12 @@ class _BrandLockup extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  const _NavItem({required this.label, this.active = false, this.onTap});
+  const _NavItem({
+    super.key,
+    required this.label,
+    this.active = false,
+    this.onTap,
+  });
 
   final String label;
   final bool active;
@@ -415,7 +474,7 @@ class _NavItem extends StatelessWidget {
 }
 
 class _GetAppButton extends StatelessWidget {
-  const _GetAppButton();
+  const _GetAppButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -599,10 +658,7 @@ class _HeroSection extends StatelessWidget {
                       children: [
                         copy,
                         const SizedBox(height: 36),
-                        Align(
-                          alignment: Alignment.center,
-                          child: visual,
-                        ),
+                        Align(alignment: Alignment.center, child: visual),
                       ],
                     );
             },
@@ -711,7 +767,8 @@ class _PhoneShowcase extends StatelessWidget {
         final availableWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : baseFrameWidth;
-        final compact = compactVisual || availableWidth < _Breakpoints.phoneCompact;
+        final compact =
+            compactVisual || availableWidth < _Breakpoints.phoneCompact;
         final scale = compact
             ? (availableWidth / baseFrameWidth).clamp(0.82, 1.0)
             : 1.0;
@@ -741,9 +798,9 @@ class _PhoneShowcase extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0x40D5DF51).withValues(
-                          alpha: compact ? 0.22 : 0.36,
-                        ),
+                        color: const Color(
+                          0x40D5DF51,
+                        ).withValues(alpha: compact ? 0.22 : 0.36),
                         blurRadius: compact ? 36 : 70,
                         spreadRadius: compact ? 0 : 8,
                       ),
@@ -792,14 +849,11 @@ class _PhoneShowcase extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0x4D000000).withValues(
-                              alpha: compact ? 0.18 : 0.30,
-                            ),
+                            color: const Color(
+                              0x4D000000,
+                            ).withValues(alpha: compact ? 0.18 : 0.30),
                             blurRadius: compact ? 18 : 42,
-                            offset: Offset(
-                              compact ? 0 : 18,
-                              compact ? 12 : 26,
-                            ),
+                            offset: Offset(compact ? 0 : 18, compact ? 12 : 26),
                           ),
                         ],
                       ),
@@ -1086,6 +1140,8 @@ class _AboutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < _Breakpoints.lg;
+
     return Container(
       padding: const EdgeInsets.all(36),
       decoration: BoxDecoration(
@@ -1103,26 +1159,57 @@ class _AboutCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 108,
-            height: 108,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(32),
-            ),
-            alignment: Alignment.center,
-            child: Icon(icon, color: Colors.white, size: 46),
-          ),
-          const SizedBox(height: 28),
-          Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 18),
+          compact
+              ? Row(
+                  children: [
+                    Container(
+                      width: 76,
+                      height: 76,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(icon, color: Colors.white, size: 34),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 108,
+                      height: 108,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(icon, color: Colors.white, size: 46),
+                    ),
+                    const SizedBox(height: 28),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+          SizedBox(height: compact ? 16 : 18),
           Text(
             body,
             style: const TextStyle(
@@ -1295,6 +1382,8 @@ class _ProfessionalFeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < _Breakpoints.lg;
+
     return Container(
       padding: const EdgeInsets.all(36),
       decoration: BoxDecoration(
@@ -1315,26 +1404,57 @@ class _ProfessionalFeatureCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 108,
-            height: 108,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(32),
-            ),
-            alignment: Alignment.center,
-            child: Icon(icon, color: Colors.white, size: 46),
-          ),
-          const SizedBox(height: 28),
-          Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 18),
+          compact
+              ? Row(
+                  children: [
+                    Container(
+                      width: 76,
+                      height: 76,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(icon, color: Colors.white, size: 34),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 108,
+                      height: 108,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(icon, color: Colors.white, size: 46),
+                    ),
+                    const SizedBox(height: 28),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+          SizedBox(height: compact ? 16 : 18),
           Text(
             body,
             style: const TextStyle(
@@ -1717,7 +1837,9 @@ class _ContactSection extends StatelessWidget {
                     'Questions, support, or partnership enquiries.',
                     style: TextStyle(
                       color: AppColors.primary,
-                      fontSize: constraints.maxWidth >= _Breakpoints.lg ? 64 : 44,
+                      fontSize: constraints.maxWidth >= _Breakpoints.lg
+                          ? 64
+                          : 44,
                       height: 1.02,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -1.8,
@@ -2369,8 +2491,7 @@ class _Footer extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 1240),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final compact =
-                    constraints.maxWidth < _Breakpoints.navCompact;
+                final compact = constraints.maxWidth < _Breakpoints.navCompact;
 
                 final brandBlock = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

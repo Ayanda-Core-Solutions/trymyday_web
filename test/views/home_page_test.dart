@@ -9,10 +9,19 @@ import 'package:trymyday_web/core/utils/app_images.dart';
 // - Primary CTAs and store download buttons are visible on first load.
 // - The phone preview screenshot asset is loaded into the home hero.
 void main() {
+  Future<void> pumpDesktopApp(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const TryMyDayApp());
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('renders the home page with its core sections', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const TryMyDayApp());
+    await pumpDesktopApp(tester);
 
     expect(find.text('Guidance that\ngets you there.'), findsOneWidget);
     expect(
@@ -23,7 +32,7 @@ void main() {
       find.text('Share what you know.\nHelp someone move faster.'),
       findsOneWidget,
     );
-    expect(find.text('Get the App'), findsOneWidget);
+    expect(find.byKey(const ValueKey('header-get-app')), findsOneWidget);
     expect(find.text('App Store'), findsOneWidget);
     expect(find.text('Google Play'), findsOneWidget);
   });
@@ -31,7 +40,7 @@ void main() {
   testWidgets('loads the phone preview asset in the hero showcase', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const TryMyDayApp());
+    await pumpDesktopApp(tester);
 
     expect(
       find.byWidgetPredicate(

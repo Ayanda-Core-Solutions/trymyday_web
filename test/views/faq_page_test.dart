@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:trymyday_web/app.dart';
@@ -8,12 +9,21 @@ import 'package:trymyday_web/app.dart';
 // - Tapping a question expands its answer.
 // - Tapping the same question again collapses the answer.
 void main() {
+  Future<void> pumpDesktopApp(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const TryMyDayApp());
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('navigates to the faq page and expands an answer', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const TryMyDayApp());
+    await pumpDesktopApp(tester);
 
-    await tester.tap(find.text('FAQ').first);
+    await tester.tap(find.byKey(const ValueKey('nav-faq')));
     await tester.pumpAndSettle();
 
     expect(find.text('Helpful answers before you book.'), findsOneWidget);

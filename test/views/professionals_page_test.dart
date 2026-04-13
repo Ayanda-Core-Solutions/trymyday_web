@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:trymyday_web/app.dart';
@@ -7,12 +8,21 @@ import 'package:trymyday_web/app.dart';
 // - The page renders the main hero copy and the three professional benefit cards.
 // - The logo remains usable as a global way back to the landing page.
 void main() {
+  Future<void> pumpDesktopApp(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const TryMyDayApp());
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('navigates to the professionals page from the header', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const TryMyDayApp());
+    await pumpDesktopApp(tester);
 
-    await tester.tap(find.text('For Professionals').first);
+    await tester.tap(find.byKey(const ValueKey('nav-professionals')));
     await tester.pumpAndSettle();
 
     expect(
@@ -27,11 +37,11 @@ void main() {
   testWidgets('returns home when the logo is tapped from professionals', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const TryMyDayApp());
+    await pumpDesktopApp(tester);
 
-    await tester.tap(find.text('For Professionals').first);
+    await tester.tap(find.byKey(const ValueKey('nav-professionals')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('TryMyDay').first);
+    await tester.tap(find.byKey(const ValueKey('nav-brand')));
     await tester.pumpAndSettle();
 
     expect(find.text('Guidance that\ngets you there.'), findsOneWidget);
