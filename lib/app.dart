@@ -33,6 +33,9 @@ class TryMyDayApp extends StatelessWidget {
         faqRoute: (context) => const FaqPage(),
         contactRoute: (context) => const ContactPage(),
         professionalsRoute: (context) => const ProfessionalsPage(),
+        privacyPolicyRoute: (context) => const PrivacyPolicyPage(),
+        termsConditionsRoute: (context) => const TermsConditionsPage(),
+        refundsPolicyRoute: (context) => const RefundsCancellationPolicyPage(),
       },
     );
   }

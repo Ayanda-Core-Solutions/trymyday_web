@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import '../../core/components/store_button.dart';
 import '../../core/services/app_remote_config.dart';
@@ -10,6 +12,7 @@ import '../../core/utils/app_images.dart';
 part 'about_page.dart';
 part 'contact_page.dart';
 part 'faq_page.dart';
+part 'legal_pages.dart';
 part 'professionals_page.dart';
 
 const String homeRoute = '/';
@@ -17,6 +20,9 @@ const String aboutRoute = '/about';
 const String faqRoute = '/faq';
 const String contactRoute = '/contact';
 const String professionalsRoute = '/professionals';
+const String privacyPolicyRoute = '/privacy-policy';
+const String termsConditionsRoute = '/terms-and-conditions';
+const String refundsPolicyRoute = '/refunds-cancellation-policy';
 
 class _Breakpoints {
   static const double md = 720;
@@ -81,10 +87,7 @@ class _LandingPageState extends State<_LandingPage> {
       selectedNav: _NavDestination.home,
       children: [
         const _HeroSection(),
-        KeyedSubtree(
-          key: _howItWorksKey,
-          child: const _HowItWorksSection(),
-        ),
+        KeyedSubtree(key: _howItWorksKey, child: const _HowItWorksSection()),
         const _ForProfessionalsSection(),
         const _Footer(),
       ],
@@ -95,7 +98,7 @@ class _LandingPageState extends State<_LandingPage> {
 class _PageShell extends StatelessWidget {
   const _PageShell({required this.selectedNav, required this.children});
 
-  final _NavDestination selectedNav;
+  final _NavDestination? selectedNav;
   final List<Widget> children;
 
   @override
@@ -129,7 +132,7 @@ enum _HeaderMenuAction { home, about, howItWorks, professionals, faq, contact }
 class _Header extends StatelessWidget {
   const _Header({required this.selectedNav});
 
-  final _NavDestination selectedNav;
+  final _NavDestination? selectedNav;
 
   @override
   Widget build(BuildContext context) {
@@ -290,12 +293,12 @@ class _Header extends StatelessWidget {
                                           SizedBox(width: navSpacing),
                                         if (selectedNav != _NavDestination.home)
                                           _NavItem(
-                                          key: const ValueKey(
-                                            'nav-how-it-works',
+                                            key: const ValueKey(
+                                              'nav-how-it-works',
+                                            ),
+                                            label: 'How it works',
+                                            onTap: () => _goHowItWorks(context),
                                           ),
-                                          label: 'How it works',
-                                          onTap: () => _goHowItWorks(context),
-                                        ),
                                         SizedBox(width: navSpacing),
                                         _NavItem(
                                           key: const ValueKey(
@@ -305,7 +308,8 @@ class _Header extends StatelessWidget {
                                           active:
                                               selectedNav ==
                                               _NavDestination.professionals,
-                                          onTap: () => _goProfessionals(context),
+                                          onTap: () =>
+                                              _goProfessionals(context),
                                         ),
                                         SizedBox(width: navSpacing),
                                         _NavItem(
@@ -359,11 +363,7 @@ class _Header extends StatelessWidget {
     if (currentRoute == aboutRoute) {
       return;
     }
-    _replaceWithFade(
-      context,
-      const AboutPage(),
-      routeName: aboutRoute,
-    );
+    _replaceWithFade(context, const AboutPage(), routeName: aboutRoute);
   }
 
   void _goHowItWorks(BuildContext context) {
@@ -391,11 +391,7 @@ class _Header extends StatelessWidget {
     if (currentRoute == faqRoute) {
       return;
     }
-    _replaceWithFade(
-      context,
-      const FaqPage(),
-      routeName: faqRoute,
-    );
+    _replaceWithFade(context, const FaqPage(), routeName: faqRoute);
   }
 
   void _goContact(BuildContext context) {
@@ -403,11 +399,7 @@ class _Header extends StatelessWidget {
     if (currentRoute == contactRoute) {
       return;
     }
-    _replaceWithFade(
-      context,
-      const ContactPage(),
-      routeName: contactRoute,
-    );
+    _replaceWithFade(context, const ContactPage(), routeName: contactRoute);
   }
 
   void _replaceWithFade(
@@ -421,12 +413,7 @@ class _Header extends StatelessWidget {
         pageBuilder: (context, animation, secondaryAnimation) => page,
         transitionDuration: const Duration(milliseconds: 220),
         reverseTransitionDuration: const Duration(milliseconds: 180),
-        transitionsBuilder: (
-          context,
-          animation,
-          secondaryAnimation,
-          child,
-        ) {
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
       ),
@@ -2594,13 +2581,13 @@ class _Footer extends StatelessWidget {
                     const SizedBox(
                       width: 370,
                       child: Text(
-                      'Career guidance through real conversations. Discover professionals, start with a coffee chat, and book sessions that move you forward.',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        height: 1.55,
+                        'Career guidance through real conversations. Discover professionals, start with a coffee chat, and book sessions that move you forward.',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          height: 1.55,
+                        ),
                       ),
-                    ),
                     ),
                   ],
                 );
@@ -2645,13 +2632,34 @@ class _Footer extends StatelessWidget {
                   ],
                 );
 
-                const legalColumn = _FooterColumn(
+                final legalColumn = _FooterColumn(
                   title: 'Legal',
                   items: [
-                    (label: 'Privacy Policy', onTap: null),
-                    (label: 'Terms and Conditions', onTap: null),
+                    (
+                      label: 'Privacy Policy',
+                      onTap: () => _navigateWithFade(
+                        context,
+                        const PrivacyPolicyPage(),
+                        routeName: privacyPolicyRoute,
+                      ),
+                    ),
+                    (
+                      label: 'Terms and Conditions',
+                      onTap: () => _navigateWithFade(
+                        context,
+                        const TermsConditionsPage(),
+                        routeName: termsConditionsRoute,
+                      ),
+                    ),
                     (label: '© 2026 TryMyDay', onTap: null),
-                    (label: 'Refunds/Cancellation Policy', onTap: null),
+                    (
+                      label: 'Refunds/Cancellation Policy',
+                      onTap: () => _navigateWithFade(
+                        context,
+                        const RefundsCancellationPolicyPage(),
+                        routeName: refundsPolicyRoute,
+                      ),
+                    ),
                   ],
                 );
 
@@ -2675,7 +2683,7 @@ class _Footer extends StatelessWidget {
                           const SizedBox(width: 56),
                           Expanded(flex: 2, child: exploreColumn),
                           const SizedBox(width: 56),
-                          const Expanded(flex: 3, child: legalColumn),
+                          Expanded(flex: 3, child: legalColumn),
                         ],
                       );
               },
@@ -2702,12 +2710,7 @@ class _Footer extends StatelessWidget {
         pageBuilder: (context, animation, secondaryAnimation) => page,
         transitionDuration: const Duration(milliseconds: 220),
         reverseTransitionDuration: const Duration(milliseconds: 180),
-        transitionsBuilder: (
-          context,
-          animation,
-          secondaryAnimation,
-          child,
-        ) {
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
       ),
@@ -2740,10 +2743,7 @@ class _FooterColumn extends StatelessWidget {
           for (final item in items)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: _FooterLink(
-                label: item.label,
-                onTap: item.onTap,
-              ),
+              child: _FooterLink(label: item.label, onTap: item.onTap),
             ),
         ],
       ),
