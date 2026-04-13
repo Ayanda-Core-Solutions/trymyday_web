@@ -30,27 +30,63 @@ class _Breakpoints {
   static const double heroCompactActions = 560;
 }
 
+enum HomeScrollTarget { howItWorks }
+
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.initialTarget});
+
+  final HomeScrollTarget? initialTarget;
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: _LandingPage());
+    return Scaffold(body: _LandingPage(initialTarget: initialTarget));
   }
 }
 
-class _LandingPage extends StatelessWidget {
-  const _LandingPage();
+class _LandingPage extends StatefulWidget {
+  const _LandingPage({this.initialTarget});
+
+  final HomeScrollTarget? initialTarget;
+
+  @override
+  State<_LandingPage> createState() => _LandingPageState();
+}
+
+class _LandingPageState extends State<_LandingPage> {
+  final GlobalKey _howItWorksKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final targetContext = switch (widget.initialTarget) {
+        HomeScrollTarget.howItWorks => _howItWorksKey.currentContext,
+        null => null,
+      };
+
+      if (targetContext != null) {
+        Scrollable.ensureVisible(
+          targetContext,
+          duration: const Duration(milliseconds: 320),
+          curve: Curves.easeOutCubic,
+          alignment: 0.02,
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const _PageShell(
+    return _PageShell(
       selectedNav: _NavDestination.home,
       children: [
-        _HeroSection(),
-        _HowItWorksSection(),
-        _ForProfessionalsSection(),
-        _Footer(),
+        const _HeroSection(),
+        KeyedSubtree(
+          key: _howItWorksKey,
+          child: const _HowItWorksSection(),
+        ),
+        const _ForProfessionalsSection(),
+        const _Footer(),
       ],
     );
   }
@@ -168,7 +204,7 @@ class _Header extends StatelessWidget {
                                 case _HeaderMenuAction.about:
                                   _goAbout(context);
                                 case _HeaderMenuAction.howItWorks:
-                                  _goHome(context);
+                                  _goHowItWorks(context);
                                 case _HeaderMenuAction.professionals:
                                   _goProfessionals(context);
                                 case _HeaderMenuAction.faq:
@@ -188,10 +224,11 @@ class _Header extends StatelessWidget {
                                 value: _HeaderMenuAction.about,
                                 active: selectedNav == _NavDestination.about,
                               ),
-                              _mobileMenuItem(
-                                label: 'How it works',
-                                value: _HeaderMenuAction.howItWorks,
-                              ),
+                              if (selectedNav != _NavDestination.home)
+                                _mobileMenuItem(
+                                  label: 'How it works',
+                                  value: _HeaderMenuAction.howItWorks,
+                                ),
                               _mobileMenuItem(
                                 label: 'For Professionals',
                                 value: _HeaderMenuAction.professionals,
@@ -249,13 +286,15 @@ class _Header extends StatelessWidget {
                                               _NavDestination.about,
                                           onTap: () => _goAbout(context),
                                         ),
-                                        SizedBox(width: navSpacing),
-                                        _NavItem(
+                                        if (selectedNav != _NavDestination.home)
+                                          SizedBox(width: navSpacing),
+                                        if (selectedNav != _NavDestination.home)
+                                          _NavItem(
                                           key: const ValueKey(
                                             'nav-how-it-works',
                                           ),
                                           label: 'How it works',
-                                          onTap: () => _goHome(context),
+                                          onTap: () => _goHowItWorks(context),
                                         ),
                                         SizedBox(width: navSpacing),
                                         _NavItem(
@@ -321,6 +360,16 @@ class _Header extends StatelessWidget {
       return;
     }
     Navigator.of(context).pushReplacementNamed(aboutRoute);
+  }
+
+  void _goHowItWorks(BuildContext context) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        settings: const RouteSettings(name: homeRoute),
+        builder: (context) =>
+            const HomePage(initialTarget: HomeScrollTarget.howItWorks),
+      ),
+    );
   }
 
   void _goProfessionals(BuildContext context) {
