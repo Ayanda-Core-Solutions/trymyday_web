@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import '../../core/components/store_button.dart';
 import '../../core/services/app_remote_config.dart';
 import '../../core/utils/app_colors.dart';
+import '../../core/utils/external_link.dart';
 import '../../core/utils/app_icons.dart';
 import '../../core/utils/app_images.dart';
 
@@ -44,7 +47,76 @@ class PageLoadingController {
   static void hide() => isVisible.value = false;
 }
 
-enum HomeScrollTarget { howItWorks }
+Future<void> _scrollToTarget(
+  BuildContext targetContext, {
+  required double viewportAlignment,
+}) async {
+  final renderObject = targetContext.findRenderObject();
+  if (renderObject is! RenderBox) return;
+
+  final scrollableState = Scrollable.of(targetContext);
+
+  final viewport = RenderAbstractViewport.of(renderObject);
+
+  final position = scrollableState.position;
+  final targetOffset =
+      viewport.getOffsetToReveal(renderObject, viewportAlignment).offset;
+  final clampedOffset = targetOffset.clamp(
+    position.minScrollExtent,
+    position.maxScrollExtent,
+  );
+
+  await position.animateTo(
+    clampedOffset,
+    duration: const Duration(milliseconds: 320),
+    curve: Curves.easeOutCubic,
+  );
+}
+
+class _AppStoreLinks {
+  static final Uri appStore = Uri.parse(
+    'https://apps.apple.com/us/search?term=TryMyDay',
+  );
+  static final Uri googlePlay = Uri.parse(
+    'https://play.google.com/store/apps/details?id=com.acs.trymyday',
+  );
+}
+
+bool _isPhoneDevice(BuildContext context) {
+  final shortestSide = MediaQuery.sizeOf(context).shortestSide;
+  return shortestSide < 700;
+}
+
+bool _isAndroidPhone(BuildContext context) {
+  return _isPhoneDevice(context) &&
+      defaultTargetPlatform == TargetPlatform.android;
+}
+
+bool _isIosPhone(BuildContext context) {
+  return _isPhoneDevice(context) && defaultTargetPlatform == TargetPlatform.iOS;
+}
+
+Future<void> _launchGooglePlay() async {
+  await openExternalUrl(_AppStoreLinks.googlePlay);
+}
+
+Future<void> _launchAppStore() async {
+  await openExternalUrl(_AppStoreLinks.appStore);
+}
+
+Uri? _storeUriForPhone(BuildContext context) {
+  if (_isAndroidPhone(context)) {
+    return _AppStoreLinks.googlePlay;
+  }
+
+  if (_isIosPhone(context)) {
+    return _AppStoreLinks.appStore;
+  }
+
+  return null;
+}
+
+enum HomeScrollTarget { howItWorks, appStores }
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key, this.initialTarget});
@@ -68,6 +140,7 @@ class _LandingPage extends StatefulWidget {
 
 class _LandingPageState extends State<_LandingPage> {
   final GlobalKey _howItWorksKey = GlobalKey();
+  final GlobalKey _appStoresKey = GlobalKey();
 
   @override
   void initState() {
@@ -75,15 +148,20 @@ class _LandingPageState extends State<_LandingPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final targetContext = switch (widget.initialTarget) {
         HomeScrollTarget.howItWorks => _howItWorksKey.currentContext,
+        HomeScrollTarget.appStores => _appStoresKey.currentContext,
         null => null,
       };
 
       if (targetContext != null) {
-        Scrollable.ensureVisible(
+        final viewportAlignment = switch (widget.initialTarget) {
+          HomeScrollTarget.howItWorks => 0.02,
+          HomeScrollTarget.appStores => 0.42,
+          null => 0.02,
+        };
+
+        _scrollToTarget(
           targetContext,
-          duration: const Duration(milliseconds: 320),
-          curve: Curves.easeOutCubic,
-          alignment: 0.02,
+          viewportAlignment: viewportAlignment,
         );
       }
     });
@@ -94,7 +172,7 @@ class _LandingPageState extends State<_LandingPage> {
     return _PageShell(
       selectedNav: _NavDestination.home,
       children: [
-        const _HeroSection(),
+        _HeroSection(appStoresKey: _appStoresKey),
         KeyedSubtree(key: _howItWorksKey, child: const _HowItWorksSection()),
         const _ForProfessionalsSection(),
         const _Footer(),
@@ -575,18 +653,134 @@ class _GetAppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      decoration: BoxDecoration(
-        color: AppColors.secondary,
-        borderRadius: BorderRadius.circular(16),
+    return _InteractiveGetAppButton(onTap: () => _handleGetApp(context));
+  }
+
+  Future<void> _handleGetApp(BuildContext context) async {
+    final storeUri = _storeUriForPhone(context);
+    if (storeUri != null) {
+      await openExternalUrl(storeUri);
+      return;
+    }
+
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    if (currentRoute == homeRoute || currentRoute == null) {
+      final targetContext =
+          AppDownloadSectionController.targetKey.currentContext;
+      if (targetContext != null) {
+        _scrollToTarget(
+          targetContext,
+          viewportAlignment: 0.42,
+        );
+      }
+      return;
+    }
+
+    PageLoadingController.show();
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder<void>(
+        settings: const RouteSettings(name: homeRoute),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const HomePage(initialTarget: HomeScrollTarget.appStores),
+        transitionDuration: const Duration(milliseconds: 220),
+        reverseTransitionDuration: const Duration(milliseconds: 180),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
       ),
-      child: const Text(
-        'Get the App',
-        style: TextStyle(
-          color: AppColors.primary,
-          fontSize: 14,
-          fontWeight: FontWeight.w900,
+    );
+  }
+}
+
+class AppDownloadSectionController {
+  static final GlobalKey targetKey = GlobalKey();
+}
+
+class _InteractiveGetAppButton extends StatefulWidget {
+  const _InteractiveGetAppButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  State<_InteractiveGetAppButton> createState() =>
+      _InteractiveGetAppButtonState();
+}
+
+class _InteractiveGetAppButtonState extends State<_InteractiveGetAppButton> {
+  bool _hovered = false;
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) {
+        setState(() {
+          _hovered = false;
+          _pressed = false;
+        });
+      },
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        scale: _pressed ? 0.97 : (_hovered ? 1.015 : 1),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
+          curve: Curves.easeOut,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadow.withValues(
+                  alpha: _hovered ? 0.2 : 0.12,
+                ),
+                blurRadius: _hovered ? 20 : 16,
+                offset: Offset(0, _hovered ? 12 : 10),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: Ink(
+              decoration: BoxDecoration(
+                color: _pressed
+                    ? const Color(0xFFD2D846)
+                    : (_hovered
+                          ? const Color(0xFFE8EE61)
+                          : AppColors.secondary),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.primary.withValues(
+                    alpha: _hovered ? 0.14 : 0.08,
+                  ),
+                ),
+              ),
+              child: InkWell(
+                onTap: widget.onTap,
+                onHighlightChanged: (value) {
+                  if (_pressed != value) {
+                    setState(() => _pressed = value);
+                  }
+                },
+                borderRadius: BorderRadius.circular(16),
+                splashColor: AppColors.primary.withValues(alpha: 0.12),
+                highlightColor: AppColors.primary.withValues(alpha: 0.08),
+                hoverColor: AppColors.primary.withValues(alpha: 0.04),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                  child: Text(
+                    'Get the App',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -594,7 +788,9 @@ class _GetAppButton extends StatelessWidget {
 }
 
 class _HeroSection extends StatelessWidget {
-  const _HeroSection();
+  const _HeroSection({required this.appStoresKey});
+
+  final GlobalKey appStoresKey;
 
   @override
   Widget build(BuildContext context) {
@@ -639,44 +835,51 @@ class _HeroSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  compactButtons
-                      ? Row(
-                          children: const [
-                            Expanded(
-                              child: StoreButton(
+                  KeyedSubtree(
+                    key: appStoresKey,
+                    child: compactButtons
+                        ? Row(
+                            children: [
+                              Expanded(
+                                child: StoreButton(
+                                  icon: AppIcons.apple,
+                                  upperLabel: 'Download on the',
+                                  lowerLabel: 'App Store',
+                                  compact: true,
+                                  onTap: _launchAppStore,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: StoreButton(
+                                  icon: AppIcons.googlePlay,
+                                  upperLabel: 'Get it on',
+                                  lowerLabel: 'Google Play',
+                                  compact: true,
+                                  onTap: _launchGooglePlay,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Wrap(
+                            spacing: 16,
+                            runSpacing: 16,
+                            children: [
+                              StoreButton(
                                 icon: AppIcons.apple,
                                 upperLabel: 'Download on the',
                                 lowerLabel: 'App Store',
-                                compact: true,
+                                onTap: _launchAppStore,
                               ),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: StoreButton(
+                              StoreButton(
                                 icon: AppIcons.googlePlay,
                                 upperLabel: 'Get it on',
                                 lowerLabel: 'Google Play',
-                                compact: true,
+                                onTap: _launchGooglePlay,
                               ),
-                            ),
-                          ],
-                        )
-                      : Wrap(
-                          spacing: 16,
-                          runSpacing: 16,
-                          children: const [
-                            StoreButton(
-                              icon: AppIcons.apple,
-                              upperLabel: 'Download on the',
-                              lowerLabel: 'App Store',
-                            ),
-                            StoreButton(
-                              icon: AppIcons.googlePlay,
-                              upperLabel: 'Get it on',
-                              lowerLabel: 'Google Play',
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                  ),
                   const SizedBox(height: 24),
                   compactStats
                       ? Wrap(
