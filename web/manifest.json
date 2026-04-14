@@ -1,11 +1,11 @@
 {
-    "name": "trymyday_web",
-    "short_name": "trymyday_web",
+    "name": "TryMyDay",
+    "short_name": "TryMyDay",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F8FBF5",
+    "theme_color": "#145652",
+    "description": "Career guidance through real conversations.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -36,6 +36,14 @@ class _Breakpoints {
   static const double heroCompactActions = 560;
 }
 
+class PageLoadingController {
+  static final ValueNotifier<bool> isVisible = ValueNotifier<bool>(false);
+
+  static void show() => isVisible.value = true;
+
+  static void hide() => isVisible.value = false;
+}
+
 enum HomeScrollTarget { howItWorks }
 
 class HomePage extends StatelessWidget {
@@ -95,11 +103,24 @@ class _LandingPageState extends State<_LandingPage> {
   }
 }
 
-class _PageShell extends StatelessWidget {
+class _PageShell extends StatefulWidget {
   const _PageShell({required this.selectedNav, required this.children});
 
   final _NavDestination? selectedNav;
   final List<Widget> children;
+
+  @override
+  State<_PageShell> createState() => _PageShellState();
+}
+
+class _PageShellState extends State<_PageShell> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PageLoadingController.hide();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,9 +135,11 @@ class _PageShell extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            _Header(selectedNav: selectedNav),
+            _Header(selectedNav: widget.selectedNav),
             Expanded(
-              child: SingleChildScrollView(child: Column(children: children)),
+              child: SingleChildScrollView(
+                child: Column(children: widget.children),
+              ),
             ),
           ],
         ),
@@ -407,6 +430,7 @@ class _Header extends StatelessWidget {
     Widget page, {
     String routeName = homeRoute,
   }) {
+    PageLoadingController.show();
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
         settings: RouteSettings(name: routeName),
@@ -2565,31 +2589,19 @@ class _Footer extends StatelessWidget {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final compact = constraints.maxWidth < _Breakpoints.navCompact;
+                final currentRoute = ModalRoute.of(context)?.settings.name;
+                final canGoHome =
+                    currentRoute != homeRoute && currentRoute != null;
 
-                final brandBlock = Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const _BrandLockup(
-                      iconAsset: AppImages.smileyWhite,
-                      textColor: Colors.white,
-                      iconSize: 42,
-                      fontSize: 18,
-                      iconBackground: Colors.white,
-                      iconColor: AppColors.primary,
-                    ),
-                    const SizedBox(height: 22),
-                    const SizedBox(
-                      width: 370,
-                      child: Text(
-                        'Career guidance through real conversations. Discover professionals, start with a coffee chat, and book sessions that move you forward.',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          height: 1.55,
-                        ),
-                      ),
-                    ),
-                  ],
+                final brandBlock = _FooterBrandBlock(
+                  canGoHome: canGoHome,
+                  onTap: canGoHome
+                      ? () => _navigateWithFade(
+                          context,
+                          const HomePage(),
+                          routeName: homeRoute,
+                        )
+                      : null,
                 );
 
                 final exploreColumn = _FooterColumn(
@@ -2704,6 +2716,7 @@ class _Footer extends StatelessWidget {
       return;
     }
 
+    PageLoadingController.show();
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
         settings: RouteSettings(name: routeName),
@@ -2713,6 +2726,71 @@ class _Footer extends StatelessWidget {
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
+      ),
+    );
+  }
+}
+
+class _FooterBrandBlock extends StatefulWidget {
+  const _FooterBrandBlock({required this.canGoHome, this.onTap});
+
+  final bool canGoHome;
+  final VoidCallback? onTap;
+
+  @override
+  State<_FooterBrandBlock> createState() => _FooterBrandBlockState();
+}
+
+class _FooterBrandBlockState extends State<_FooterBrandBlock> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: widget.canGoHome ? SystemMouseCursors.click : MouseCursor.defer,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(18),
+          splashColor: Colors.white.withValues(alpha: 0.18),
+          highlightColor: Colors.white.withValues(alpha: 0.08),
+          hoverColor: Colors.white.withValues(alpha: 0.08),
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 140),
+            opacity: _hovered && widget.canGoHome ? 0.92 : 1,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _BrandLockup(
+                    iconAsset: AppImages.smileyWhite,
+                    textColor: Colors.white,
+                    iconSize: 42,
+                    fontSize: 18,
+                    iconBackground: Colors.white,
+                    iconColor: AppColors.primary,
+                  ),
+                  SizedBox(height: 22),
+                  SizedBox(
+                    width: 370,
+                    child: Text(
+                      'Career guidance through real conversations. Discover professionals, start with a coffee chat, and book sessions that move you forward.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        height: 1.55,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

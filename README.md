@@ -1,17 +1,22 @@
 # trymyday_web
 
-A new Flutter project.
+TryMyDay web app.
 
-## Getting Started
+## Run locally
 
-This project is a starting point for a Flutter application.
+For normal local development in VS Code, you can still use:
 
-A few resources to get you started if this is your first Flutter project:
+- `TryMyDay Web (Chrome)`
+- `TryMyDay Web (Chrome Release)`
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+If Chrome shows the `--no-sandbox` warning banner when launched by Flutter, use a local static-serve flow instead:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# trymyday_web
+1. Run the VS Code task `Build Web`
+2. Run the VS Code task `Serve build/web`
+3. Open `http://localhost:8080` in your normal browser
+
+There is also a combined task:
+
+- `Build and Serve Web`
+
+This avoids Flutter launching its managed Chrome instance.

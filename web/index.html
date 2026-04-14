@@ -18,21 +18,164 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Career guidance through real conversations.">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="trymyday_web">
+  <meta name="apple-mobile-web-app-title" content="TryMyDay">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="shortcut icon" href="favicon.svg"/>
 
-  <title>trymyday_web</title>
+  <title>TryMyDay</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --trymyday-primary: #165a56;
+      --trymyday-secondary: #e1e754;
+      --trymyday-background: #f8f8f2;
+      --trymyday-surface: #ffffff;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #f8fbf5 0%, #f3f7f0 52%, #f8f8f2 100%);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    #app-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #f8fbf5 0%, #f3f7f0 52%, #f8f8f2 100%);
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+
+    #app-loader.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-card {
+      width: min(420px, calc(100vw - 48px));
+      padding: 28px 28px 24px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(216, 227, 221, 0.95);
+      box-shadow: 0 18px 44px rgba(18, 60, 57, 0.12);
+      text-align: center;
+    }
+
+    .loader-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+      color: var(--trymyday-primary);
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .loader-brand img {
+      width: 46px;
+      height: 46px;
+      display: block;
+    }
+
+    .loader-title {
+      margin: 0;
+      color: var(--trymyday-primary);
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 0.98;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+    }
+
+    .loader-copy {
+      margin: 16px auto 0;
+      max-width: 320px;
+      color: #56706d;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .loader-progress {
+      width: 100%;
+      height: 8px;
+      margin-top: 22px;
+      border-radius: 999px;
+      background: rgba(22, 90, 86, 0.08);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loader-progress::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 36%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--trymyday-primary), var(--trymyday-secondary));
+      animation: trymyday-loading 1s ease-in-out infinite;
+      transform-origin: left center;
+    }
+
+    @keyframes trymyday-loading {
+      0% {
+        transform: translateX(-110%);
+      }
+      50% {
+        transform: translateX(95%);
+      }
+      100% {
+        transform: translateX(230%);
+      }
+    }
+  </style>
 </head>
 <body>
+  <div id="app-loader" aria-label="Loading TryMyDay">
+    <div class="loader-card">
+      <div class="loader-brand">
+        <img src="favicon.svg" alt="TryMyDay logo">
+        <span>TryMyDay</span>
+      </div>
+      <h1 class="loader-title">Guidance that gets you there.</h1>
+      <p class="loader-copy">
+        Loading real career conversations, practical advice, and the next step forward.
+      </p>
+      <div class="loader-progress"></div>
+    </div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      const loader = document.getElementById('app-loader');
+      if (loader) {
+        loader.classList.add('is-hidden');
+        window.setTimeout(function () {
+          loader.remove();
+          document.body.style.overflow = '';
+        }, 260);
+      }
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
