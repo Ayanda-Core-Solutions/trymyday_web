@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -34,6 +35,31 @@ const String professionalsRoute = '/professionals';
 const String privacyPolicyRoute = '/privacy-policy';
 const String termsConditionsRoute = '/terms-and-conditions';
 const String refundsPolicyRoute = '/refunds-cancellation-policy';
+const String homeTargetHowItWorks = 'how-it-works';
+const String homeTargetAppStores = 'app-stores';
+
+String _homeLocation({HomeScrollTarget? target}) {
+  final targetValue = switch (target) {
+    HomeScrollTarget.howItWorks => homeTargetHowItWorks,
+    HomeScrollTarget.appStores => homeTargetAppStores,
+    null => null,
+  };
+
+  if (targetValue == null) return homeRoute;
+
+  return Uri(
+    path: homeRoute,
+    queryParameters: {'target': targetValue},
+  ).toString();
+}
+
+String _faqTopicLocation(String topicSlug) {
+  return Uri(path: faqRoute, queryParameters: {'topic': topicSlug}).toString();
+}
+
+String _currentRoutePath(BuildContext context) {
+  return GoRouterState.of(context).uri.path;
+}
 
 class _Breakpoints {
   static const double md = 720;

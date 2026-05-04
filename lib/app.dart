@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'core/utils/app_colors.dart';
 import 'views/home/home_page.dart';
@@ -6,13 +7,61 @@ import 'views/home/home_page.dart';
 class TryMyDayApp extends StatelessWidget {
   const TryMyDayApp({super.key});
 
+  static final GoRouter _router = GoRouter(
+    routes: [
+      GoRoute(
+        path: homeRoute,
+        pageBuilder: (context, state) => _fadePage(
+          state,
+          HomePage(initialTarget: _homeTargetFromUri(state.uri)),
+        ),
+      ),
+      GoRoute(
+        path: aboutRoute,
+        pageBuilder: (context, state) => _fadePage(state, const AboutPage()),
+      ),
+      GoRoute(
+        path: faqRoute,
+        pageBuilder: (context, state) => _fadePage(
+          state,
+          FaqPage(initialExpandedTopicSlug: state.uri.queryParameters['topic']),
+        ),
+      ),
+      GoRoute(
+        path: contactRoute,
+        pageBuilder: (context, state) => _fadePage(state, const ContactPage()),
+      ),
+      GoRoute(
+        path: professionalsRoute,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const ProfessionalsPage()),
+      ),
+      GoRoute(
+        path: privacyPolicyRoute,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const PrivacyPolicyPage()),
+      ),
+      GoRoute(
+        path: termsConditionsRoute,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const TermsConditionsPage()),
+      ),
+      GoRoute(
+        path: refundsPolicyRoute,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const RefundsCancellationPolicyPage()),
+      ),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) {
     final baseTheme = ThemeData.light(useMaterial3: true);
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'TryMyDay',
       debugShowCheckedModeBanner: false,
+      routerConfig: _router,
       theme: baseTheme.copyWith(
         scaffoldBackgroundColor: AppColors.background,
         colorScheme: const ColorScheme.light(
@@ -78,17 +127,26 @@ class TryMyDayApp extends StatelessWidget {
           ],
         );
       },
-      initialRoute: homeRoute,
-      routes: {
-        homeRoute: (context) => const HomePage(),
-        aboutRoute: (context) => const AboutPage(),
-        faqRoute: (context) => const FaqPage(),
-        contactRoute: (context) => const ContactPage(),
-        professionalsRoute: (context) => const ProfessionalsPage(),
-        privacyPolicyRoute: (context) => const PrivacyPolicyPage(),
-        termsConditionsRoute: (context) => const TermsConditionsPage(),
-        refundsPolicyRoute: (context) => const RefundsCancellationPolicyPage(),
+    );
+  }
+
+  static Page<void> _fadePage(GoRouterState state, Widget child) {
+    return CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 220),
+      reverseTransitionDuration: const Duration(milliseconds: 180),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
       },
     );
+  }
+
+  static HomeScrollTarget? _homeTargetFromUri(Uri uri) {
+    return switch (uri.queryParameters['target']) {
+      homeTargetHowItWorks => HomeScrollTarget.howItWorks,
+      homeTargetAppStores => HomeScrollTarget.appStores,
+      _ => null,
+    };
   }
 }

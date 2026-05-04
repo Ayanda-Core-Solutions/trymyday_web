@@ -16,18 +16,13 @@ class _Footer extends StatelessWidget {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final compact = constraints.maxWidth < _Breakpoints.navCompact;
-                final currentRoute = ModalRoute.of(context)?.settings.name;
-                final canGoHome =
-                    currentRoute != homeRoute && currentRoute != null;
+                final currentRoute = _currentRoutePath(context);
+                final canGoHome = currentRoute != homeRoute;
 
                 final brandBlock = _FooterBrandBlock(
                   canGoHome: canGoHome,
                   onTap: canGoHome
-                      ? () => _navigateWithFade(
-                          context,
-                          const HomePage(),
-                          routeName: homeRoute,
-                        )
+                      ? () => _navigateWithFade(context, _homeLocation())
                       : null,
                 );
 
@@ -36,37 +31,23 @@ class _Footer extends StatelessWidget {
                   items: [
                     (
                       label: 'About',
-                      onTap: () => _navigateWithFade(
-                        context,
-                        const AboutPage(),
-                        routeName: aboutRoute,
-                      ),
+                      onTap: () => _navigateWithFade(context, aboutRoute),
                     ),
                     (
                       label: 'How it works',
                       onTap: () => _navigateWithFade(
                         context,
-                        const HomePage(
-                          initialTarget: HomeScrollTarget.howItWorks,
-                        ),
-                        routeName: homeRoute,
+                        _homeLocation(target: HomeScrollTarget.howItWorks),
                       ),
                     ),
                     (
                       label: 'For Professionals',
-                      onTap: () => _navigateWithFade(
-                        context,
-                        const ProfessionalsPage(),
-                        routeName: professionalsRoute,
-                      ),
+                      onTap: () =>
+                          _navigateWithFade(context, professionalsRoute),
                     ),
                     (
                       label: 'FAQ',
-                      onTap: () => _navigateWithFade(
-                        context,
-                        const FaqPage(),
-                        routeName: faqRoute,
-                      ),
+                      onTap: () => _navigateWithFade(context, faqRoute),
                     ),
                   ],
                 );
@@ -76,28 +57,19 @@ class _Footer extends StatelessWidget {
                   items: [
                     (
                       label: 'Privacy Policy',
-                      onTap: () => _navigateWithFade(
-                        context,
-                        const PrivacyPolicyPage(),
-                        routeName: privacyPolicyRoute,
-                      ),
+                      onTap: () =>
+                          _navigateWithFade(context, privacyPolicyRoute),
                     ),
                     (
                       label: 'Terms and Conditions',
-                      onTap: () => _navigateWithFade(
-                        context,
-                        const TermsConditionsPage(),
-                        routeName: termsConditionsRoute,
-                      ),
+                      onTap: () =>
+                          _navigateWithFade(context, termsConditionsRoute),
                     ),
                     (label: '© 2026 TryMyDay', onTap: null),
                     (
                       label: 'Refunds/Cancellation Policy',
-                      onTap: () => _navigateWithFade(
-                        context,
-                        const RefundsCancellationPolicyPage(),
-                        routeName: refundsPolicyRoute,
-                      ),
+                      onTap: () =>
+                          _navigateWithFade(context, refundsPolicyRoute),
                     ),
                   ],
                 );
@@ -133,28 +105,15 @@ class _Footer extends StatelessWidget {
     );
   }
 
-  void _navigateWithFade(
-    BuildContext context,
-    Widget page, {
-    required String routeName,
-  }) {
-    final currentRoute = ModalRoute.of(context)?.settings.name;
-    if (currentRoute == routeName && page is! HomePage) {
+  void _navigateWithFade(BuildContext context, String location) {
+    final currentRoute = _currentRoutePath(context);
+    final targetRoute = Uri.parse(location).path;
+    if (currentRoute == targetRoute && targetRoute != homeRoute) {
       return;
     }
 
     PageLoadingController.show();
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder<void>(
-        settings: RouteSettings(name: routeName),
-        pageBuilder: (context, animation, secondaryAnimation) => page,
-        transitionDuration: const Duration(milliseconds: 220),
-        reverseTransitionDuration: const Duration(milliseconds: 180),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    );
+    context.go(location);
   }
 }
 

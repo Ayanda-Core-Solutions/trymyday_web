@@ -271,74 +271,52 @@ class _Header extends StatelessWidget {
   }
 
   void _goHome(BuildContext context) {
-    final currentRoute = ModalRoute.of(context)?.settings.name;
-    if (currentRoute == homeRoute || currentRoute == null) {
+    final currentRoute = _currentRoutePath(context);
+    if (currentRoute == homeRoute) {
       return;
     }
-    _replaceWithFade(context, const HomePage());
+    _pushLocation(context, _homeLocation());
   }
 
   void _goAbout(BuildContext context) {
-    final currentRoute = ModalRoute.of(context)?.settings.name;
+    final currentRoute = _currentRoutePath(context);
     if (currentRoute == aboutRoute) {
       return;
     }
-    _replaceWithFade(context, const AboutPage(), routeName: aboutRoute);
+    _pushLocation(context, aboutRoute);
   }
 
   void _goHowItWorks(BuildContext context) {
-    _replaceWithFade(
-      context,
-      const HomePage(initialTarget: HomeScrollTarget.howItWorks),
-      routeName: homeRoute,
-    );
+    _pushLocation(context, _homeLocation(target: HomeScrollTarget.howItWorks));
   }
 
   void _goProfessionals(BuildContext context) {
-    final currentRoute = ModalRoute.of(context)?.settings.name;
+    final currentRoute = _currentRoutePath(context);
     if (currentRoute == professionalsRoute) {
       return;
     }
-    _replaceWithFade(
-      context,
-      const ProfessionalsPage(),
-      routeName: professionalsRoute,
-    );
+    _pushLocation(context, professionalsRoute);
   }
 
   void _goFaq(BuildContext context) {
-    final currentRoute = ModalRoute.of(context)?.settings.name;
+    final currentRoute = _currentRoutePath(context);
     if (currentRoute == faqRoute) {
       return;
     }
-    _replaceWithFade(context, const FaqPage(), routeName: faqRoute);
+    _pushLocation(context, faqRoute);
   }
 
   void _goContact(BuildContext context) {
-    final currentRoute = ModalRoute.of(context)?.settings.name;
+    final currentRoute = _currentRoutePath(context);
     if (currentRoute == contactRoute) {
       return;
     }
-    _replaceWithFade(context, const ContactPage(), routeName: contactRoute);
+    _pushLocation(context, contactRoute);
   }
 
-  void _replaceWithFade(
-    BuildContext context,
-    Widget page, {
-    String routeName = homeRoute,
-  }) {
+  void _pushLocation(BuildContext context, String location) {
     PageLoadingController.show();
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder<void>(
-        settings: RouteSettings(name: routeName),
-        pageBuilder: (context, animation, secondaryAnimation) => page,
-        transitionDuration: const Duration(milliseconds: 220),
-        reverseTransitionDuration: const Duration(milliseconds: 180),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    );
+    context.go(location);
   }
 
   PopupMenuItem<_HeaderMenuAction> _mobileMenuItem({
@@ -482,8 +460,8 @@ class _GetAppButton extends StatelessWidget {
       return;
     }
 
-    final currentRoute = ModalRoute.of(context)?.settings.name;
-    if (currentRoute == homeRoute || currentRoute == null) {
+    final currentRoute = _currentRoutePath(context);
+    if (currentRoute == homeRoute) {
       final targetContext =
           AppDownloadSectionController.targetKey.currentContext;
       if (targetContext != null) {
@@ -493,18 +471,7 @@ class _GetAppButton extends StatelessWidget {
     }
 
     PageLoadingController.show();
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder<void>(
-        settings: const RouteSettings(name: homeRoute),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const HomePage(initialTarget: HomeScrollTarget.appStores),
-        transitionDuration: const Duration(milliseconds: 220),
-        reverseTransitionDuration: const Duration(milliseconds: 180),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    );
+    context.go(_homeLocation(target: HomeScrollTarget.appStores));
   }
 }
 

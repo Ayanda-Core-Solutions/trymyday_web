@@ -2,31 +2,37 @@ part of '../home/home_page.dart';
 
 const _faqItems = [
   (
+    slug: 'free-coffee-chat',
     question: 'What is a free coffee chat?',
     answer:
         'A short casual video or voice conversation that helps you ask quick questions before committing to a paid session.',
   ),
   (
+    slug: 'book-paid-session',
     question: 'How do I book a paid session?',
     answer:
         'Search for a professional, open their profile, review their availability, then select a paid booking option.',
   ),
   (
+    slug: 'reschedule-session',
     question: 'Can I reschedule a session?',
     answer:
         'Yes, your activity and schedule areas are designed to support rescheduling where the booking terms allow it.',
   ),
   (
+    slug: 'professional-rates',
     question: 'Do professionals set their own rates?',
     answer:
         'Yes. Professionals can define their rates and availability from their side of the platform.',
   ),
   (
+    slug: 'join-session',
     question: 'How do I join a session?',
     answer:
         'When it’s time, go to your schedule area and tap into the session room.',
   ),
   (
+    slug: 'book-again',
     question: 'Can I book the same professional again?',
     answer:
         'Yes, the activity history encourages repeat bookings for ongoing mentorship and support.',
@@ -34,9 +40,9 @@ const _faqItems = [
 ];
 
 class _FaqSection extends StatelessWidget {
-  const _FaqSection({this.initialExpandedQuestion});
+  const _FaqSection({this.initialExpandedTopicSlug});
 
-  final String? initialExpandedQuestion;
+  final String? initialExpandedTopicSlug;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +103,7 @@ class _FaqSection extends StatelessWidget {
                                 question: item.question,
                                 answer: item.answer,
                                 initiallyExpanded:
-                                    item.question == initialExpandedQuestion,
+                                    item.slug == initialExpandedTopicSlug,
                               ),
                             ),
                           )
@@ -117,7 +123,7 @@ class _FaqSection extends StatelessWidget {
                                 question: item.question,
                                 answer: item.answer,
                                 initiallyExpanded:
-                                    item.question == initialExpandedQuestion,
+                                    item.slug == initialExpandedTopicSlug,
                               ),
                             ),
                           )
@@ -134,7 +140,7 @@ class _FaqSection extends StatelessWidget {
                               question: item.question,
                               answer: item.answer,
                               initiallyExpanded:
-                                  item.question == initialExpandedQuestion,
+                                  item.slug == initialExpandedTopicSlug,
                             ),
                           ),
                         )

@@ -92,7 +92,7 @@ class _ContactSection extends StatelessWidget {
                       for (final (index, item) in supportTopics.indexed) ...[
                         _SupportTopic(
                           text: item.question,
-                          onTap: () => _openFaqTopic(context, item.question),
+                          onTap: () => _openFaqTopic(context, item.slug),
                         ),
                         if (index < supportTopics.length - 1)
                           const SizedBox(height: 14),
@@ -161,20 +161,9 @@ class _ContactSection extends StatelessWidget {
     );
   }
 
-  void _openFaqTopic(BuildContext context, String question) {
+  void _openFaqTopic(BuildContext context, String topicSlug) {
     PageLoadingController.show();
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder<void>(
-        settings: const RouteSettings(name: faqRoute),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            FaqPage(initialExpandedQuestion: question),
-        transitionDuration: const Duration(milliseconds: 220),
-        reverseTransitionDuration: const Duration(milliseconds: 180),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    );
+    context.go(_faqTopicLocation(topicSlug));
   }
 }
 
