@@ -51,6 +51,13 @@ class _ContactSection extends StatelessWidget {
                       SizedBox(height: 10),
                       _ContactInput(hintText: 'you@example.com'),
                       SizedBox(height: 22),
+                      _ContactFieldLabel(label: 'Mobile number (optional)'),
+                      SizedBox(height: 10),
+                      _ContactInput(
+                        hintText: '+27 82 123 4567',
+                        keyboardType: TextInputType.phone,
+                      ),
+                      SizedBox(height: 22),
                       _ContactFieldLabel(label: 'How can we help?'),
                       SizedBox(height: 10),
                       _ContactInput(hintText: 'Tell us more...', maxLines: 5),
@@ -186,15 +193,21 @@ class _ContactFieldLabel extends StatelessWidget {
 }
 
 class _ContactInput extends StatelessWidget {
-  const _ContactInput({required this.hintText, this.maxLines = 1});
+  const _ContactInput({
+    required this.hintText,
+    this.maxLines = 1,
+    this.keyboardType,
+  });
 
   final String hintText;
   final int maxLines;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       maxLines: maxLines,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(color: Color(0xFF6B7484), fontSize: 16),

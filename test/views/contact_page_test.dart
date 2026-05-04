@@ -31,6 +31,8 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Send us a message'), findsOneWidget);
+    expect(find.text('Mobile number (optional)'), findsOneWidget);
+    expect(find.text('+27 82 123 4567'), findsOneWidget);
     expect(find.text('Support topics'), findsOneWidget);
     expect(find.text('What is a free coffee chat?'), findsOneWidget);
     expect(find.text('How do I book a paid session?'), findsOneWidget);
