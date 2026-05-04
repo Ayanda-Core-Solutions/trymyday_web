@@ -74,7 +74,7 @@ class _HowItWorksSection extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        'This page translates the app’s main journey into plain language so new visitors know exactly what to expect.',
+                        'Use TryMyDay to find experienced professionals, compare session options, and book the conversation that fits your next step.',
                         style: TextStyle(
                           color: AppColors.textMuted,
                           fontSize: 17,

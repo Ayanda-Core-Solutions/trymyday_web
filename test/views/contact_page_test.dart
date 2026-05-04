@@ -6,6 +6,7 @@ import 'package:trymyday_web/app.dart';
 // Covered scenarios:
 // - The Contact Us header link routes to the dedicated contact page.
 // - The page renders the support form and the topics panel.
+// - Support topics open the matching FAQ answer.
 // - The Home header item routes back to the landing page from contact.
 void main() {
   Future<void> pumpDesktopApp(WidgetTester tester) async {
@@ -26,11 +27,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text('Questions, support, or partnership enquiries.'),
+      find.text('Questions about TryMyDay? We’re here to help.'),
       findsOneWidget,
     );
     expect(find.text('Send us a message'), findsOneWidget);
     expect(find.text('Support topics'), findsOneWidget);
+    expect(find.text('What is a free coffee chat?'), findsOneWidget);
+    expect(find.text('How do I book a paid session?'), findsOneWidget);
+    expect(find.text('Can I reschedule a session?'), findsOneWidget);
+    expect(find.text('Do professionals set their own rates?'), findsOneWidget);
+    expect(find.text('How do I join a session?'), findsNothing);
     expect(find.text('Submit'), findsOneWidget);
   });
 
@@ -45,5 +51,24 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Guidance that\ngets you there.'), findsOneWidget);
+  });
+
+  testWidgets('opens the selected support topic on the faq page', (
+    WidgetTester tester,
+  ) async {
+    await pumpDesktopApp(tester);
+
+    await tester.tap(find.byKey(const ValueKey('nav-contact')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('How do I book a paid session?'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Helpful answers before you book.'), findsOneWidget);
+    expect(
+      find.text(
+        'Search for a professional, open their profile, review their availability, then select a paid booking option.',
+      ),
+      findsOneWidget,
+    );
   });
 }

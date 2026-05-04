@@ -13,6 +13,7 @@ class _ContactSection extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final stacked = constraints.maxWidth < 980;
+              final supportTopics = _faqItems.take(4).toList();
 
               final formCard = Expanded(
                 flex: stacked ? 0 : 8,
@@ -76,10 +77,10 @@ class _ContactSection extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Support topics',
                         style: TextStyle(
                           color: AppColors.primary,
@@ -87,14 +88,15 @@ class _ContactSection extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      SizedBox(height: 20),
-                      _SupportTopic(text: 'Booking issues'),
-                      SizedBox(height: 14),
-                      _SupportTopic(text: 'Account and profile help'),
-                      SizedBox(height: 14),
-                      _SupportTopic(text: 'Payments and refunds'),
-                      SizedBox(height: 14),
-                      _SupportTopic(text: 'Partnerships and media'),
+                      const SizedBox(height: 20),
+                      for (final (index, item) in supportTopics.indexed) ...[
+                        _SupportTopic(
+                          text: item.question,
+                          onTap: () => _openFaqTopic(context, item.question),
+                        ),
+                        if (index < supportTopics.length - 1)
+                          const SizedBox(height: 14),
+                      ],
                     ],
                   ),
                 ),
@@ -113,7 +115,7 @@ class _ContactSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'Questions, support, or partnership enquiries.',
+                    'Questions about TryMyDay? We’re here to help.',
                     style: TextStyle(
                       color: AppColors.primary,
                       fontSize: constraints.maxWidth >= _Breakpoints.lg
@@ -126,7 +128,7 @@ class _ContactSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
                   const Text(
-                    'The contact page is designed to feel light, trustworthy, and easy to use.',
+                    'Send us a message about bookings, accounts, payments, or partnerships and we’ll point you in the right direction.',
                     style: TextStyle(
                       color: AppColors.primary,
                       fontSize: 19,
@@ -155,6 +157,22 @@ class _ContactSection extends StatelessWidget {
             },
           ),
         ),
+      ),
+    );
+  }
+
+  void _openFaqTopic(BuildContext context, String question) {
+    PageLoadingController.show();
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder<void>(
+        settings: const RouteSettings(name: faqRoute),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            FaqPage(initialExpandedQuestion: question),
+        transitionDuration: const Duration(milliseconds: 220),
+        reverseTransitionDuration: const Duration(milliseconds: 180),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
       ),
     );
   }
@@ -234,18 +252,31 @@ class _ContactSubmitButton extends StatelessWidget {
 }
 
 class _SupportTopic extends StatelessWidget {
-  const _SupportTopic({required this.text});
+  const _SupportTopic({required this.text, required this.onTap});
 
   final String text;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: AppColors.primary,
-        fontSize: 18,
-        height: 1.35,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 18,
+              height: 1.35,
+              decoration: TextDecoration.underline,
+              decorationColor: AppColors.primary,
+            ),
+          ),
+        ),
       ),
     );
   }
