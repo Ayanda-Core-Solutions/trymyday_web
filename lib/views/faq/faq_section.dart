@@ -39,10 +39,42 @@ const _faqItems = [
   ),
 ];
 
-class _FaqSection extends StatelessWidget {
+class _FaqSection extends StatefulWidget {
   const _FaqSection({this.initialExpandedTopicSlug});
 
   final String? initialExpandedTopicSlug;
+
+  @override
+  State<_FaqSection> createState() => _FaqSectionState();
+}
+
+class _FaqSectionState extends State<_FaqSection> {
+  final GlobalKey _selectedFaqKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollToSelectedFaq();
+  }
+
+  @override
+  void didUpdateWidget(_FaqSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialExpandedTopicSlug != widget.initialExpandedTopicSlug) {
+      _scrollToSelectedFaq();
+    }
+  }
+
+  void _scrollToSelectedFaq() {
+    if (widget.initialExpandedTopicSlug == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final targetContext = _selectedFaqKey.currentContext;
+      if (targetContext == null || !mounted) return;
+
+      _scrollToTarget(targetContext, viewportAlignment: 0.12);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,11 +131,17 @@ class _FaqSection extends StatelessWidget {
                           .map(
                             (item) => SizedBox(
                               width: (constraints.maxWidth - 48) / 3,
-                              child: _FaqCard(
-                                question: item.question,
-                                answer: item.answer,
-                                initiallyExpanded:
-                                    item.slug == initialExpandedTopicSlug,
+                              child: _FaqItemTarget(
+                                itemSlug: item.slug,
+                                selectedSlug: widget.initialExpandedTopicSlug,
+                                selectedKey: _selectedFaqKey,
+                                child: _FaqCard(
+                                  question: item.question,
+                                  answer: item.answer,
+                                  initiallyExpanded:
+                                      item.slug ==
+                                      widget.initialExpandedTopicSlug,
+                                ),
                               ),
                             ),
                           )
@@ -119,11 +157,17 @@ class _FaqSection extends StatelessWidget {
                           .map(
                             (item) => SizedBox(
                               width: (constraints.maxWidth - 18) / 2,
-                              child: _FaqCard(
-                                question: item.question,
-                                answer: item.answer,
-                                initiallyExpanded:
-                                    item.slug == initialExpandedTopicSlug,
+                              child: _FaqItemTarget(
+                                itemSlug: item.slug,
+                                selectedSlug: widget.initialExpandedTopicSlug,
+                                selectedKey: _selectedFaqKey,
+                                child: _FaqCard(
+                                  question: item.question,
+                                  answer: item.answer,
+                                  initiallyExpanded:
+                                      item.slug ==
+                                      widget.initialExpandedTopicSlug,
+                                ),
                               ),
                             ),
                           )
@@ -136,11 +180,17 @@ class _FaqSection extends StatelessWidget {
                         .map(
                           (item) => Padding(
                             padding: const EdgeInsets.only(bottom: 18),
-                            child: _FaqCard(
-                              question: item.question,
-                              answer: item.answer,
-                              initiallyExpanded:
-                                  item.slug == initialExpandedTopicSlug,
+                            child: _FaqItemTarget(
+                              itemSlug: item.slug,
+                              selectedSlug: widget.initialExpandedTopicSlug,
+                              selectedKey: _selectedFaqKey,
+                              child: _FaqCard(
+                                question: item.question,
+                                answer: item.answer,
+                                initiallyExpanded:
+                                    item.slug ==
+                                    widget.initialExpandedTopicSlug,
+                              ),
                             ),
                           ),
                         )
@@ -153,6 +203,29 @@ class _FaqSection extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _FaqItemTarget extends StatelessWidget {
+  const _FaqItemTarget({
+    required this.itemSlug,
+    required this.selectedSlug,
+    required this.selectedKey,
+    required this.child,
+  });
+
+  final String itemSlug;
+  final String? selectedSlug;
+  final GlobalKey selectedKey;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (itemSlug != selectedSlug) {
+      return child;
+    }
+
+    return KeyedSubtree(key: selectedKey, child: child);
   }
 }
 
