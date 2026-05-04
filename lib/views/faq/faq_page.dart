@@ -1,4 +1,4 @@
-part of 'home_page.dart';
+part of '../home/home_page.dart';
 
 class FaqPage extends StatelessWidget {
   const FaqPage({super.key});

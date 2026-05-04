@@ -1,4 +1,4 @@
-part of 'home_page.dart';
+part of '../home/home_page.dart';
 
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});

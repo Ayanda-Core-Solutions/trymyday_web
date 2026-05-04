@@ -35,34 +35,37 @@ class TryMyDayApp extends StatelessWidget {
               builder: (context, isVisible, _) {
                 return IgnorePointer(
                   ignoring: !isVisible,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 160),
-                    opacity: isVisible ? 1 : 0,
-                    child: Container(
-                      color: AppColors.primary.withValues(alpha: 0.22),
-                      alignment: Alignment.center,
+                  child: TickerMode(
+                    enabled: isVisible,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 160),
+                      opacity: isVisible ? 1 : 0,
                       child: Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(22),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: AppColors.shadow,
-                              blurRadius: 24,
-                              offset: Offset(0, 12),
-                            ),
-                          ],
-                        ),
+                        color: AppColors.primary.withValues(alpha: 0.22),
                         alignment: Alignment.center,
-                        child: const SizedBox(
-                          width: 28,
-                          height: 28,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(22),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: AppColors.shadow,
+                                blurRadius: 24,
+                                offset: Offset(0, 12),
+                              ),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: const SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           ),
                         ),
