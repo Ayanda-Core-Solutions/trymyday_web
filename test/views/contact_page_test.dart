@@ -55,6 +55,22 @@ void main() {
     expect(find.text('Guidance that\ngets you there.'), findsOneWidget);
   });
 
+  testWidgets('shows an error when required contact fields are missing', (
+    WidgetTester tester,
+  ) async {
+    await pumpDesktopApp(tester);
+
+    await tester.tap(find.byKey(const ValueKey('nav-contact')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Submit'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Please add your name, email, and message.'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('opens the selected support topic on the faq page', (
     WidgetTester tester,
   ) async {

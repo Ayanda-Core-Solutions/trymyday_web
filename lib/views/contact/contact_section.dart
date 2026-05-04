@@ -31,40 +31,7 @@ class _ContactSection extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Send us a message',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      _ContactFieldLabel(label: 'Name'),
-                      SizedBox(height: 10),
-                      _ContactInput(hintText: 'Your full name'),
-                      SizedBox(height: 22),
-                      _ContactFieldLabel(label: 'Email'),
-                      SizedBox(height: 10),
-                      _ContactInput(hintText: 'you@example.com'),
-                      SizedBox(height: 22),
-                      _ContactFieldLabel(label: 'Mobile number (optional)'),
-                      SizedBox(height: 10),
-                      _ContactInput(
-                        hintText: '+27 82 123 4567',
-                        keyboardType: TextInputType.phone,
-                      ),
-                      SizedBox(height: 22),
-                      _ContactFieldLabel(label: 'How can we help?'),
-                      SizedBox(height: 10),
-                      _ContactInput(hintText: 'Tell us more...', maxLines: 5),
-                      SizedBox(height: 18),
-                      _ContactSubmitButton(),
-                    ],
-                  ),
+                  child: const _ContactForm(),
                 ),
               );
 
@@ -174,6 +141,168 @@ class _ContactSection extends StatelessWidget {
   }
 }
 
+enum _ContactSubmitState { idle, sending, success, error }
+
+Future<void> _sendContactEmail({
+  required String name,
+  required String email,
+  required String message,
+  String? mobile,
+}) {
+  return ContactEmailService().send(
+    name: name,
+    email: email,
+    message: message,
+    mobile: mobile,
+  );
+}
+
+class _ContactForm extends StatefulWidget {
+  const _ContactForm();
+
+  @override
+  State<_ContactForm> createState() => _ContactFormState();
+}
+
+class _ContactFormState extends State<_ContactForm> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _mobileController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+
+  _ContactSubmitState _submitState = _ContactSubmitState.idle;
+  String? _statusMessage;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _mobileController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = switch (_submitState) {
+      _ContactSubmitState.success => AppColors.primary,
+      _ContactSubmitState.error => const Color(0xFFB3261E),
+      _ => AppColors.textMuted,
+    };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Send us a message',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 20),
+        const _ContactFieldLabel(label: 'Name'),
+        const SizedBox(height: 10),
+        _ContactInput(
+          controller: _nameController,
+          hintText: 'Your full name',
+          textInputAction: TextInputAction.next,
+        ),
+        const SizedBox(height: 22),
+        const _ContactFieldLabel(label: 'Email'),
+        const SizedBox(height: 10),
+        _ContactInput(
+          controller: _emailController,
+          hintText: 'you@example.com',
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+        ),
+        const SizedBox(height: 22),
+        const _ContactFieldLabel(label: 'Mobile number (optional)'),
+        const SizedBox(height: 10),
+        _ContactInput(
+          controller: _mobileController,
+          hintText: '+27 82 123 4567',
+          keyboardType: TextInputType.phone,
+          textInputAction: TextInputAction.next,
+        ),
+        const SizedBox(height: 22),
+        const _ContactFieldLabel(label: 'How can we help?'),
+        const SizedBox(height: 10),
+        _ContactInput(
+          controller: _messageController,
+          hintText: 'Tell us more...',
+          maxLines: 5,
+          textInputAction: TextInputAction.newline,
+        ),
+        const SizedBox(height: 18),
+        _ContactSubmitButton(
+          sending: _submitState == _ContactSubmitState.sending,
+          onTap: _submit,
+        ),
+        if (_statusMessage != null) ...[
+          const SizedBox(height: 14),
+          Text(
+            _statusMessage!,
+            style: TextStyle(
+              color: statusColor,
+              fontSize: 15,
+              height: 1.35,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _submit() async {
+    if (_submitState == _ContactSubmitState.sending) return;
+
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final mobile = _mobileController.text.trim();
+    final message = _messageController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || message.isEmpty) {
+      setState(() {
+        _submitState = _ContactSubmitState.error;
+        _statusMessage = 'Please add your name, email, and message.';
+      });
+      return;
+    }
+
+    setState(() {
+      _submitState = _ContactSubmitState.sending;
+      _statusMessage = null;
+    });
+
+    try {
+      await _sendContactEmail(
+        name: name,
+        email: email,
+        mobile: mobile.isEmpty ? null : mobile,
+        message: message,
+      );
+      if (!mounted) return;
+
+      setState(() {
+        _submitState = _ContactSubmitState.success;
+        _statusMessage = 'Message sent. We’ll get back to you soon.';
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _submitState = _ContactSubmitState.error;
+        _statusMessage =
+            'We could not send your message. Please try again or email ${AppEnvironment.contactEmailAddress} directly.';
+      });
+    }
+  }
+}
+
 class _ContactFieldLabel extends StatelessWidget {
   const _ContactFieldLabel({required this.label});
 
@@ -194,20 +323,26 @@ class _ContactFieldLabel extends StatelessWidget {
 
 class _ContactInput extends StatelessWidget {
   const _ContactInput({
+    required this.controller,
     required this.hintText,
     this.maxLines = 1,
     this.keyboardType,
+    this.textInputAction,
   });
 
+  final TextEditingController controller;
   final String hintText;
   final int maxLines;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
+      textInputAction: textInputAction,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(color: Color(0xFF6B7484), fontSize: 16),
@@ -231,22 +366,34 @@ class _ContactInput extends StatelessWidget {
 }
 
 class _ContactSubmitButton extends StatelessWidget {
-  const _ContactSubmitButton();
+  const _ContactSubmitButton({required this.sending, required this.onTap});
+
+  final bool sending;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 52, vertical: 22),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: sending ? null : onTap,
         borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Text(
-        'Submit',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 52, vertical: 22),
+          decoration: BoxDecoration(
+            color: sending
+                ? AppColors.primary.withValues(alpha: 0.72)
+                : AppColors.primary,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+            sending ? 'Sending...' : 'Submit',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
       ),
     );
