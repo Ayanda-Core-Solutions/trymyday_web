@@ -1,5 +1,8 @@
 {
   "APP_ENV": "dev",
   "CONTACT_EMAIL_ADDRESS": "dev@example.com",
-  "CLOUD_FUNCTIONS_REGION": "us-central1"
+  "CLOUD_FUNCTIONS_REGION": "us-central1",
+  "LAUNCH_GATE_ENABLED": true,
+  "LAUNCH_GATE_END_AT": "2026-06-01T00:00:00+02:00",
+  "LAUNCH_GATE_ADMIN_TOKEN": "replace-with-preview-token"
 }

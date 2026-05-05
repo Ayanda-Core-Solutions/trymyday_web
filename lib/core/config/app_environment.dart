@@ -13,4 +13,18 @@ class AppEnvironment {
     'CLOUD_FUNCTIONS_REGION',
     defaultValue: 'us-central1',
   );
+
+  static const bool launchGateEnabled = bool.fromEnvironment(
+    'LAUNCH_GATE_ENABLED',
+  );
+
+  static const String launchGateEndAt = String.fromEnvironment(
+    'LAUNCH_GATE_END_AT',
+    defaultValue: '2026-06-01T00:00:00+02:00',
+  );
+
+  static const String launchGateAdminToken = String.fromEnvironment(
+    'LAUNCH_GATE_ADMIN_TOKEN',
+    defaultValue: '',
+  );
 }

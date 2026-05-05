@@ -2,13 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/utils/app_colors.dart';
+import 'core/config/app_environment.dart';
+import 'views/launch/launch_countdown_page.dart';
 import 'views/home/home_page.dart';
+
+const String launchRoute = '/launch';
 
 class TryMyDayApp extends StatelessWidget {
   const TryMyDayApp({super.key});
 
   static final GoRouter _router = GoRouter(
+    redirect: (context, state) {
+      final launchGate = _LaunchGate.fromEnvironment();
+      final isLaunchRoute = state.uri.path == launchRoute;
+
+      if (!launchGate.isActive) {
+        return isLaunchRoute ? homeRoute : null;
+      }
+
+      if (launchGate.hasAdminAccess(state.uri)) {
+        _LaunchGateSession.unlock();
+        return isLaunchRoute ? homeRoute : null;
+      }
+
+      if (_LaunchGateSession.isUnlocked) return null;
+
+      return isLaunchRoute ? null : launchRoute;
+    },
     routes: [
+      GoRoute(
+        path: launchRoute,
+        pageBuilder: (context, state) => _fadePage(
+          state,
+          LaunchCountdownPage(launchAt: _LaunchGate.fromEnvironment().endAt),
+        ),
+      ),
       GoRoute(
         path: homeRoute,
         pageBuilder: (context, state) => _fadePage(
@@ -148,5 +176,44 @@ class TryMyDayApp extends StatelessWidget {
       homeTargetAppStores => HomeScrollTarget.appStores,
       _ => null,
     };
+  }
+}
+
+class _LaunchGate {
+  const _LaunchGate({
+    required this.isEnabled,
+    required this.endAt,
+    required this.adminToken,
+  });
+
+  factory _LaunchGate.fromEnvironment() {
+    return _LaunchGate(
+      isEnabled: AppEnvironment.launchGateEnabled,
+      endAt: DateTime.parse(AppEnvironment.launchGateEndAt),
+      adminToken: AppEnvironment.launchGateAdminToken.trim(),
+    );
+  }
+
+  final bool isEnabled;
+  final DateTime endAt;
+  final String adminToken;
+
+  bool get isActive => isEnabled && DateTime.now().isBefore(endAt);
+
+  bool hasAdminAccess(Uri uri) {
+    if (adminToken.isEmpty) return false;
+
+    final token =
+        uri.queryParameters['admin'] ?? uri.queryParameters['preview'];
+
+    return token == adminToken;
+  }
+}
+
+class _LaunchGateSession {
+  static bool isUnlocked = false;
+
+  static void unlock() {
+    isUnlocked = true;
   }
 }
