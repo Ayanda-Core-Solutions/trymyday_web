@@ -6,7 +6,7 @@ class AppEnvironment {
 
   static const String contactEmailAddress = String.fromEnvironment(
     'CONTACT_EMAIL_ADDRESS',
-    defaultValue: 'ayandamhlongo@gmail.com',
+    defaultValue: 'ayandamhlongof@gmail.com',
   );
 
   static const String cloudFunctionsRegion = String.fromEnvironment(

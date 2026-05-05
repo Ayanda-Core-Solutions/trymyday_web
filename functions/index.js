@@ -7,13 +7,13 @@ const smtpUser = defineSecret("SMTP_USER");
 const smtpPass = defineSecret("SMTP_PASS");
 
 const contactRecipient =
-  process.env.CONTACT_EMAIL_ADDRESS || "ayandamhlongo@gmail.com";
+  process.env.CONTACT_EMAIL_ADDRESS || "ayandamhlongof@gmail.com";
 const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
 const smtpPort = Number(process.env.SMTP_PORT || 587);
 const smtpSecure = process.env.SMTP_SECURE === "true";
 const smtpFromName = process.env.SMTP_FROM_NAME || "TryMyDay";
 
-exports.sendContactEmail = onCall(
+exports.sendWebContactEmail = onCall(
   {secrets: [smtpUser, smtpPass]},
   async (request) => {
     const data = request.data || {};
@@ -31,8 +31,8 @@ exports.sendContactEmail = onCall(
       port: smtpPort,
       secure: smtpSecure,
       auth: {
-        user: smtpUser.value(),
-        pass: smtpPass.value(),
+        user: smtpUser.value().trim(),
+        pass: smtpPass.value().replace(/\s/g, ""),
       },
     });
 
@@ -44,7 +44,7 @@ exports.sendContactEmail = onCall(
     ];
 
     await transporter.sendMail({
-      from: `${smtpFromName} <${smtpUser.value()}>`,
+      from: `${smtpFromName} <${smtpUser.value().trim()}>`,
       to: contactRecipient,
       replyTo: email,
       subject: `TryMyDay contact enquiry from ${name}`,

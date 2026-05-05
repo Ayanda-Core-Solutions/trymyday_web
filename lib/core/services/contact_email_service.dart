@@ -18,7 +18,7 @@ class ContactEmailService {
     required String message,
     String? mobile,
   }) async {
-    final callable = _functions.httpsCallable('sendContactEmail');
+    final callable = _functions.httpsCallable('sendWebContactEmail');
 
     await callable.call<void>({
       'name': name,

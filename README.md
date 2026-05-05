@@ -6,8 +6,8 @@ TryMyDay web app.
 
 For normal local development in VS Code, you can still use:
 
-- `TryMyDay Web (Chrome)`
-- `TryMyDay Web (Chrome Release)`
+- `Dev TryMyDay Web`
+- `Prod TryMyDay Web`
 
 If Chrome shows the `--no-sandbox` warning banner when launched by Flutter, use a local static-serve flow instead:
 
@@ -46,6 +46,10 @@ flutter run -d chrome --dart-define-from-file=env/dev.json
 flutter build web --dart-define-from-file=env/prod.json
 ```
 
+The VS Code launch dropdown is already configured to use `env/dev.json` for
+`Dev TryMyDay Web` and `env/prod.json` for `Prod TryMyDay Web`. The `Build Web`
+task also uses `env/prod.json`.
+
 Cloud Functions runtime values use `.env` files. Create these local files from
 the committed examples:
 
@@ -63,4 +67,11 @@ For local emulator work, copy the matching functions env file to
 ```sh
 firebase functions:secrets:set SMTP_USER
 firebase functions:secrets:set SMTP_PASS
+```
+
+The web contact form Cloud Function is isolated in the Firebase `web` codebase.
+Deploy it with:
+
+```sh
+firebase deploy --only functions:web:sendWebContactEmail
 ```
