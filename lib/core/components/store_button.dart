@@ -13,7 +13,7 @@ class StoreButton extends StatefulWidget {
     this.onTap,
   });
 
-  final IconData icon;
+  final FaIconData icon;
   final String upperLabel;
   final String lowerLabel;
   final bool compact;
@@ -33,9 +33,7 @@ class _StoreButtonState extends State<StoreButton> {
     final lowerFontSize = widget.compact ? 16.0 : 21.0;
     final iconSlotSize = lowerFontSize + (widget.compact ? 10 : 15);
     final iconSize = _iconScale(widget.icon) * iconSlotSize;
-    final iconWidget = widget.icon.fontPackage == 'font_awesome_flutter'
-        ? FaIcon(widget.icon, color: Colors.white, size: iconSize)
-        : Icon(widget.icon, color: Colors.white, size: iconSize);
+    final iconWidget = FaIcon(widget.icon, color: Colors.white, size: iconSize);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -136,7 +134,7 @@ class _StoreButtonState extends State<StoreButton> {
     );
   }
 
-  double _iconScale(IconData value) {
+  double _iconScale(FaIconData value) {
     if (value == FontAwesomeIcons.apple) {
       return 0.83;
     }
