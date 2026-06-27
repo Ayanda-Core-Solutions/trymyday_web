@@ -65,6 +65,16 @@ class TryMyDayApp extends StatelessWidget {
             _fadePage(state, const ProfessionalsPage()),
       ),
       GoRoute(
+        path: professionalProfileRoute,
+        pageBuilder: (context, state) {
+          final professionalId = state.pathParameters['id']!;
+          return _fadePage(
+            state,
+            ProfessionalPublicProfilePage(professionalId: professionalId),
+          );
+        },
+      ),
+      GoRoute(
         path: privacyPolicyRoute,
         pageBuilder: (context, state) =>
             _fadePage(state, const PrivacyPolicyPage()),

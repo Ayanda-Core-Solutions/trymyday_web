@@ -1,0 +1,20 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.acs.trymyday",
+      "sha256_cert_fingerprints": ["REPLACE_WITH_PLAY_APP_SIGNING_SHA256"]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.acs.trymyday.nonprod",
+      "sha256_cert_fingerprints": [
+        "1E:9C:F9:2B:18:1E:97:51:7F:34:85:8D:5E:83:70:0B:06:98:DB:B9:F6:ED:EB:A4:68:34:4F:9F:3E:B4:D1:EF"
+      ]
+    }
+  }
+]
