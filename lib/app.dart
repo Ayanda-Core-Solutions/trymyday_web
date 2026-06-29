@@ -75,6 +75,15 @@ class TryMyDayApp extends StatelessWidget {
         },
       ),
       GoRoute(
+        path: authMagicLinkRoute,
+        pageBuilder: (context, state) => _fadePage(
+          state,
+          AuthMagicLinkPage(
+            hasToken: state.uri.queryParameters['token'] != null,
+          ),
+        ),
+      ),
+      GoRoute(
         path: privacyPolicyRoute,
         pageBuilder: (context, state) =>
             _fadePage(state, const PrivacyPolicyPage()),

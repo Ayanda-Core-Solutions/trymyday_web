@@ -4,11 +4,11 @@
     "details": [
       {
         "appID": "4HHS9HG9F2.com.acs.trymyday",
-        "paths": ["/meet/*"]
+        "paths": ["/meet/*", "/auth/magic*"]
       },
       {
         "appID": "4HHS9HG9F2.com.acs.trymyday.nonprod",
-        "paths": ["/meet/*"]
+        "paths": ["/meet/*", "/auth/magic*"]
       }
     ]
   }
