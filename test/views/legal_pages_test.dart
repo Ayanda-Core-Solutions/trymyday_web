@@ -59,4 +59,24 @@ void main() {
       expect(find.textContaining('South African Rand (ZAR)'), findsOneWidget);
     },
   );
+
+  testWidgets('navigates to the account deletion page from the footer', (
+    WidgetTester tester,
+  ) async {
+    await pumpDesktopApp(tester);
+
+    await tester.ensureVisible(find.text('Account Deletion'));
+    await tester.tap(find.text('Account Deletion'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Account Deletion'), findsWidgets);
+    expect(find.textContaining('Delete my TryMyDay account'), findsOneWidget);
+    expect(find.textContaining('hello@trymyday.co.za'), findsOneWidget);
+    expect(
+      find.textContaining(
+        'Deletion requests are normally processed within 30 days',
+      ),
+      findsOneWidget,
+    );
+  });
 }

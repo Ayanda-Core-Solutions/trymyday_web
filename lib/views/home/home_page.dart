@@ -41,6 +41,7 @@ const String authMagicLinkRoute = '/auth/magic';
 const String privacyPolicyRoute = '/privacy-policy';
 const String termsConditionsRoute = '/terms-and-conditions';
 const String refundsPolicyRoute = '/refunds-cancellation-policy';
+const String accountDeletionRoute = '/account-deletion';
 const String homeTargetHowItWorks = 'how-it-works';
 const String homeTargetAppStores = 'app-stores';
 

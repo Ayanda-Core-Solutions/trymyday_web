@@ -96,6 +96,11 @@ class TryMyDayApp extends StatelessWidget {
         pageBuilder: (context, state) =>
             _fadePage(state, const RefundsCancellationPolicyPage()),
       ),
+      GoRoute(
+        path: accountDeletionRoute,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const AccountDeletionPage()),
+      ),
     ],
   );
 

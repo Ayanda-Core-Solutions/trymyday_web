@@ -226,6 +226,46 @@ class RefundsCancellationPolicyPage extends StatelessWidget {
   }
 }
 
+class AccountDeletionPage extends StatelessWidget {
+  const AccountDeletionPage({super.key});
+
+  static const LegalDocumentModel fallback = LegalDocumentModel(
+    id: 'account_deletion',
+    title: 'Account Deletion',
+    version: '1.0',
+    effectiveDate: '29 Jun 2026',
+    content:
+        'TryMyDay lets users request deletion of their account and associated personal data.\n\n'
+        'How to request account deletion\n'
+        '1. Send an email to hello@trymyday.co.za from the email address linked to your TryMyDay account.\n'
+        '2. Use the subject line: Delete my TryMyDay account.\n'
+        '3. Include your full name and the email address used in the app.\n'
+        '4. We may ask you to confirm the request before deletion is processed.\n\n'
+        'What we delete\n'
+        'When your request is verified, we delete or anonymise personal account data where deletion is technically and legally possible. This includes profile information, app preferences, favourites, push notification tokens, and non-essential account records.\n\n'
+        'What may be retained\n'
+        'Some information may be retained where required for legal, security, fraud-prevention, accounting, payment, dispute-resolution, or platform integrity purposes. This may include payment records, booking records, consent records, support correspondence, safety reports, transaction audit logs, and records needed to comply with applicable law.\n\n'
+        'Retention period\n'
+        'Deletion requests are normally processed within 30 days after verification. Data that must be retained for legal, accounting, security, or dispute-resolution reasons is kept only for as long as reasonably required for those purposes.\n\n'
+        'Partial data deletion\n'
+        'You can also request deletion or correction of specific personal data without deleting your full account by emailing hello@trymyday.co.za and describing the data you want removed or corrected.\n\n'
+        'Developer\n'
+        'TryMyDay is provided by Ayanda Core Solutions (Pty) Ltd.',
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: _LegalDocumentPageBody(
+        selectedNav: null,
+        documentId: 'account_deletion',
+        fallback: fallback,
+        eyebrow: 'Account and data controls',
+      ),
+    );
+  }
+}
+
 class _LegalDocumentPageBody extends StatelessWidget {
   const _LegalDocumentPageBody({
     required this.selectedNav,

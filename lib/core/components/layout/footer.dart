@@ -71,6 +71,11 @@ class _Footer extends StatelessWidget {
                       onTap: () =>
                           _navigateWithFade(context, refundsPolicyRoute),
                     ),
+                    (
+                      label: 'Account Deletion',
+                      onTap: () =>
+                          _navigateWithFade(context, accountDeletionRoute),
+                    ),
                   ],
                 );
 
