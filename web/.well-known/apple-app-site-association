@@ -4,11 +4,45 @@
     "details": [
       {
         "appID": "4HHS9HG9F2.com.acs.trymyday",
-        "paths": ["/meet/*", "/auth/magic", "/auth/magic*"]
+        "paths": ["/meet/*", "/auth/magic", "/auth/magic*"],
+        "components": [
+          {
+            "/": "/meet/*",
+            "comment": "Professional public profile links"
+          },
+          {
+            "/": "/auth/magic",
+            "?": {
+              "token": "*"
+            },
+            "comment": "Email magic sign-in links"
+          },
+          {
+            "/": "/auth/magic",
+            "comment": "Email magic sign-in route without query"
+          }
+        ]
       },
       {
         "appID": "4HHS9HG9F2.com.acs.trymyday.nonprod",
-        "paths": ["/meet/*", "/auth/magic", "/auth/magic*"]
+        "paths": ["/meet/*", "/auth/magic", "/auth/magic*"],
+        "components": [
+          {
+            "/": "/meet/*",
+            "comment": "Professional public profile links"
+          },
+          {
+            "/": "/auth/magic",
+            "?": {
+              "token": "*"
+            },
+            "comment": "Email magic sign-in links"
+          },
+          {
+            "/": "/auth/magic",
+            "comment": "Email magic sign-in route without query"
+          }
+        ]
       }
     ]
   }
