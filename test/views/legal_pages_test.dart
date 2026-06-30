@@ -70,7 +70,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Account Deletion'), findsWidgets);
-    expect(find.textContaining('Delete my TryMyDay account'), findsOneWidget);
+    expect(find.text('Submit deletion request'), findsOneWidget);
+    expect(find.text('Full name'), findsOneWidget);
+    expect(find.text('Email address'), findsOneWidget);
     expect(find.textContaining('hello@trymyday.co.za'), findsOneWidget);
     expect(
       find.textContaining(

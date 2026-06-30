@@ -226,7 +226,7 @@ class RefundsCancellationPolicyPage extends StatelessWidget {
   }
 }
 
-class AccountDeletionPage extends StatelessWidget {
+class AccountDeletionPage extends StatefulWidget {
   const AccountDeletionPage({super.key});
 
   static const LegalDocumentModel fallback = LegalDocumentModel(
@@ -254,13 +254,550 @@ class AccountDeletionPage extends StatelessWidget {
   );
 
   @override
+  State<AccountDeletionPage> createState() => _AccountDeletionPageState();
+}
+
+class _AccountDeletionPageState extends State<AccountDeletionPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _reasonController = TextEditingController();
+  final _service = AccountDeletionRequestService();
+
+  bool _isSubmitting = false;
+  AccountDeletionRequestResult? _result;
+  String? _error;
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: _LegalDocumentPageBody(
+    return Scaffold(
+      body: _PageShell(
         selectedNav: null,
-        documentId: 'account_deletion',
-        fallback: fallback,
-        eyebrow: 'Account and data controls',
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 56),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1080),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(34),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: AppColors.border),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: AppColors.shadow,
+                        blurRadius: 20,
+                        offset: Offset(0, 12),
+                      ),
+                    ],
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isNarrow = constraints.maxWidth < 820;
+                      final details = _AccountDeletionDetails(
+                        document: AccountDeletionPage.fallback,
+                      );
+                      final form = _result == null
+                          ? _AccountDeletionForm(
+                              formKey: _formKey,
+                              fullNameController: _fullNameController,
+                              emailController: _emailController,
+                              reasonController: _reasonController,
+                              isSubmitting: _isSubmitting,
+                              error: _error,
+                              onSubmit: _submit,
+                            )
+                          : _AccountDeletionSuccess(result: _result!);
+
+                      if (isNarrow) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [details, const SizedBox(height: 28), form],
+                        );
+                      }
+
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: details),
+                          const SizedBox(width: 34),
+                          SizedBox(width: 390, child: form),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const _Footer(),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isSubmitting = true;
+      _error = null;
+    });
+
+    try {
+      final result = await _service.submit(
+        fullName: _fullNameController.text,
+        email: _emailController.text,
+        reason: _reasonController.text,
+      );
+      if (!mounted) return;
+      setState(() => _result = result);
+    } on FirebaseFunctionsException catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.message ?? 'Request failed.');
+    } catch (_) {
+      if (!mounted) return;
+      setState(
+        () => _error =
+            'We could not submit your request. Please try again or email hello@trymyday.co.za.',
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+}
+
+class _AccountDeletionDetails extends StatelessWidget {
+  const _AccountDeletionDetails({required this.document});
+
+  final LegalDocumentModel document;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Account and data controls',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          document.title,
+          style: const TextStyle(
+            color: AppColors.primary,
+            fontSize: 44,
+            height: 1.02,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -1.4,
+          ),
+        ),
+        const SizedBox(height: 18),
+        Text(
+          'Version ${document.version} · Effective ${document.effectiveDate}',
+          style: const TextStyle(
+            color: AppColors.textMuted,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 28),
+        const _DeletionPoint(
+          icon: Icons.app_registration_rounded,
+          title: 'Use the form first',
+          body:
+              'Submit your request here and we will create a structured deletion request for the TryMyDay team.',
+        ),
+        const _DeletionPoint(
+          icon: Icons.delete_outline_rounded,
+          title: 'What we delete',
+          body:
+              'We delete or anonymise personal account data where deletion is technically and legally possible.',
+        ),
+        const _DeletionPoint(
+          icon: Icons.receipt_long_rounded,
+          title: 'What may be retained',
+          body:
+              'Payment, booking, consent, support, safety, dispute, and audit records may be retained where required.',
+        ),
+        const _DeletionPoint(
+          icon: Icons.schedule_rounded,
+          title: 'Processing time',
+          body:
+              'Deletion requests are normally processed within 30 days after verification.',
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Email fallback: hello@trymyday.co.za',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DeletionPoint extends StatelessWidget {
+  const _DeletionPoint({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  body,
+                  style: const TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 15,
+                    height: 1.45,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountDeletionForm extends StatelessWidget {
+  const _AccountDeletionForm({
+    required this.formKey,
+    required this.fullNameController,
+    required this.emailController,
+    required this.reasonController,
+    required this.isSubmitting,
+    required this.error,
+    required this.onSubmit,
+  });
+
+  final GlobalKey<FormState> formKey;
+  final TextEditingController fullNameController;
+  final TextEditingController emailController;
+  final TextEditingController reasonController;
+  final bool isSubmitting;
+  final String? error;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceMuted,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Submit deletion request',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Use the email address linked to your TryMyDay account if you still know it.',
+              style: TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 14,
+                height: 1.4,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 18),
+            _DeletionTextField(
+              label: 'Full name',
+              controller: fullNameController,
+              textInputAction: TextInputAction.next,
+              validator: (value) => value == null || value.trim().isEmpty
+                  ? 'Enter your full name.'
+                  : null,
+            ),
+            const SizedBox(height: 14),
+            _DeletionTextField(
+              label: 'Email address',
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              validator: _validateEmail,
+            ),
+            const SizedBox(height: 14),
+            _DeletionTextField(
+              label: 'Reason (optional)',
+              controller: reasonController,
+              minLines: 4,
+              maxLines: 5,
+              textInputAction: TextInputAction.newline,
+            ),
+            const SizedBox(height: 16),
+            const _RetentionNotice(),
+            if (error != null) ...[
+              const SizedBox(height: 14),
+              Text(
+                error!,
+                style: const TextStyle(
+                  color: Color(0xFFB3261E),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.surface,
+                  minimumSize: const Size.fromHeight(54),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                onPressed: isSubmitting ? null : onSubmit,
+                icon: isSubmitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.surface,
+                        ),
+                      )
+                    : const Icon(Icons.send_rounded),
+                label: Text(
+                  isSubmitting ? 'Submitting...' : 'Submit request',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String? _validateEmail(String? value) {
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.isEmpty) return 'Enter your email address.';
+    final valid = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(trimmed);
+    return valid ? null : 'Enter a valid email address.';
+  }
+}
+
+class _DeletionTextField extends StatelessWidget {
+  const _DeletionTextField({
+    required this.label,
+    required this.controller,
+    this.keyboardType,
+    this.textInputAction,
+    this.validator,
+    this.minLines = 1,
+    this.maxLines = 1,
+  });
+
+  final String label;
+  final TextEditingController controller;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final FormFieldValidator<String>? validator;
+  final int minLines;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      validator: validator,
+      minLines: minLines,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: AppColors.surface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
+        ),
+      ),
+    );
+  }
+}
+
+class _RetentionNotice extends StatelessWidget {
+  const _RetentionNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.verified_user_rounded, color: AppColors.primary, size: 20),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'By submitting this request, you acknowledge that some records may be retained where required for legal, payment, security, or dispute-resolution purposes.',
+              style: TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 13,
+                height: 1.4,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountDeletionSuccess extends StatelessWidget {
+  const _AccountDeletionSuccess({required this.result});
+
+  final AccountDeletionRequestResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = result.alreadyExists
+        ? 'Request already received'
+        : 'Request received';
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 74,
+            height: 74,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.check_rounded,
+              color: AppColors.primary,
+              size: 40,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'We will review your request and may contact you to verify it before deletion is processed.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 15,
+              height: 1.45,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            'Request ref: ${result.requestId}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }
