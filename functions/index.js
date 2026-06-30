@@ -2,24 +2,19 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const logger = require("firebase-functions/logger");
-const nodemailer = require("nodemailer");
 
 if (!admin.apps.length) {
   admin.initializeApp();
 }
 
-const smtpUser = defineSecret("SMTP_USER");
-const smtpPass = defineSecret("SMTP_PASS");
+const resendApiKey = defineSecret("RESEND_API_KEY");
+const resendFromEmail = defineSecret("RESEND_FROM_EMAIL");
 
 const contactRecipient =
   process.env.CONTACT_EMAIL_ADDRESS || "ayandamhlongof@gmail.com";
-const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
-const smtpPort = Number(process.env.SMTP_PORT || 587);
-const smtpSecure = process.env.SMTP_SECURE === "true";
-const smtpFromName = process.env.SMTP_FROM_NAME || "TryMyDay";
 
 exports.sendWebContactEmail = onCall(
-  {secrets: [smtpUser, smtpPass]},
+  {secrets: [resendApiKey, resendFromEmail]},
   async (request) => {
     const data = request.data || {};
     const name = readRequired(data.name, "name");
@@ -31,16 +26,6 @@ exports.sendWebContactEmail = onCall(
       throw new HttpsError("invalid-argument", "A valid email is required.");
     }
 
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpSecure,
-      auth: {
-        user: smtpUser.value().trim(),
-        pass: smtpPass.value().replace(/\s/g, ""),
-      },
-    });
-
     const fields = [
       ["Name", name],
       ["Email", email],
@@ -48,8 +33,7 @@ exports.sendWebContactEmail = onCall(
       ["Message", message],
     ];
 
-    await transporter.sendMail({
-      from: `${smtpFromName} <${smtpUser.value().trim()}>`,
+    await sendResendEmail({
       to: contactRecipient,
       replyTo: email,
       subject: `TryMyDay contact enquiry from ${name}`,
@@ -68,7 +52,7 @@ exports.sendWebContactEmail = onCall(
 );
 
 exports.requestWebAccountDeletion = onCall(
-  {secrets: [smtpUser, smtpPass]},
+  {secrets: [resendApiKey, resendFromEmail]},
   async (request) => {
     const data = request.data || {};
     const fullName = readRequired(data.fullName, "fullName");
@@ -149,16 +133,6 @@ exports.requestWebAccountDeletion = onCall(
 );
 
 async function sendAccountDeletionNotice({fullName, email, reason, requestId}) {
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpSecure,
-    auth: {
-      user: smtpUser.value().trim(),
-      pass: smtpPass.value().replace(/\s/g, ""),
-    },
-  });
-
   const fields = [
     ["Request ID", requestId],
     ["Name", fullName],
@@ -166,8 +140,7 @@ async function sendAccountDeletionNotice({fullName, email, reason, requestId}) {
     ["Reason", reason || "Not provided"],
   ];
 
-  await transporter.sendMail({
-    from: `${smtpFromName} <${smtpUser.value().trim()}>`,
+  await sendResendEmail({
     to: contactRecipient,
     replyTo: email,
     subject: `TryMyDay account deletion request from ${fullName}`,
@@ -178,6 +151,41 @@ async function sendAccountDeletionNotice({fullName, email, reason, requestId}) {
       })
       .join(""),
   });
+}
+
+async function sendResendEmail({to, replyTo, subject, text, html}) {
+  const apiKey = resendApiKey.value();
+  const fromEmail = resendFromEmail.value();
+
+  if (!apiKey || !fromEmail) {
+    logger.error("Missing Resend config for web email.");
+    throw new HttpsError("failed-precondition", "Email is not configured.");
+  }
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: fromEmail,
+      to: [to],
+      reply_to: replyTo,
+      subject,
+      text,
+      html,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    logger.error("Resend web email failed", {
+      status: response.status,
+      body: errorBody.slice(0, 500),
+    });
+    throw new HttpsError("internal", "Email could not be sent.");
+  }
 }
 
 function readRequired(value, fieldName) {

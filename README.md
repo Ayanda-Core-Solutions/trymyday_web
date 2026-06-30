@@ -62,16 +62,16 @@ The local files should be:
 - `functions/.env.prod`
 
 For local emulator work, copy the matching functions env file to
-`functions/.env`. Keep SMTP credentials in Firebase secrets, not env files:
+`functions/.env`. Keep Resend credentials in Firebase secrets, not env files:
 
 ```sh
-firebase functions:secrets:set SMTP_USER
-firebase functions:secrets:set SMTP_PASS
+firebase functions:secrets:set RESEND_API_KEY
+firebase functions:secrets:set RESEND_FROM_EMAIL
 ```
 
-The web contact form Cloud Function is isolated in the Firebase `web` codebase.
-Deploy it with:
+The web contact form and web account deletion Cloud Functions are isolated in
+the Firebase `web` codebase. Deploy them with:
 
 ```sh
-firebase deploy --only functions:web:sendWebContactEmail
+firebase deploy --only functions:web:sendWebContactEmail,functions:web:requestWebAccountDeletion
 ```
