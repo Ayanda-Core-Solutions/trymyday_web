@@ -421,13 +421,13 @@ class _AccountDeletionDetails extends StatelessWidget {
           icon: Icons.app_registration_rounded,
           title: 'Use the form first',
           body:
-              'Submit your request here and we will create a structured deletion request for the TryMyDay team.',
+              'Submit your request here and we will verify and process it directly.',
         ),
         const _DeletionPoint(
           icon: Icons.delete_outline_rounded,
           title: 'What we delete',
           body:
-              'We delete or anonymise personal account data where deletion is technically and legally possible.',
+              'We delete or anonymise personal account data where deletion is technically and legally possible, including profile details, preferences, favourites, push tokens, and non-essential account records.',
         ),
         const _DeletionPoint(
           icon: Icons.receipt_long_rounded,
@@ -436,11 +436,19 @@ class _AccountDeletionDetails extends StatelessWidget {
               'Payment, booking, consent, support, safety, dispute, and audit records may be retained where required.',
         ),
         const _DeletionPoint(
+          icon: Icons.manage_accounts_rounded,
+          title: 'Specific data requests',
+          body:
+              'You can request correction or deletion of specific personal data without deleting your full account. Use the form and describe what you want corrected or removed.',
+        ),
+        const _DeletionPoint(
           icon: Icons.schedule_rounded,
           title: 'Processing time',
           body:
               'Deletion requests are normally processed within 30 days after verification.',
         ),
+        const SizedBox(height: 18),
+        const _DeletionInfoPanel(),
         const SizedBox(height: 16),
         const Text(
           'Email fallback: hello@trymyday.co.za',
@@ -451,6 +459,92 @@ class _AccountDeletionDetails extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DeletionInfoPanel extends StatelessWidget {
+  const _DeletionInfoPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'What deleting your account means',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          SizedBox(height: 10),
+          _DeletionBullet(
+            text:
+                'You may lose access to your TryMyDay account, profile, saved professionals, notification preferences, and app settings.',
+          ),
+          _DeletionBullet(
+            text:
+                'Upcoming or completed bookings, payments, refunds, support cases, safety reports, and consent records may be retained where required for legal, payment, security, dispute-resolution, or audit purposes.',
+          ),
+          _DeletionBullet(
+            text:
+                'If you only want one item corrected or removed, say that clearly in the form instead of requesting full account deletion.',
+          ),
+          _DeletionBullet(
+            text:
+                'We may contact you to verify ownership before processing the request.',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DeletionBullet extends StatelessWidget {
+  const _DeletionBullet({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            margin: const EdgeInsets.only(top: 8),
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 14,
+                height: 1.45,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
