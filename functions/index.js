@@ -132,6 +132,146 @@ exports.requestWebAccountDeletion = onCall(
   },
 );
 
+
+exports.submitWebProfessionalApplication = onCall(
+  {secrets: [resendApiKey, resendFromEmail]},
+  async (request) => {
+    const data = request.data || {};
+    const fullName = readRequired(data.fullName, "fullName");
+    const email = readRequired(data.email, "email").toLowerCase();
+    const role = readRequired(data.role, "role");
+    const experience = readRequired(data.experience, "experience");
+    const location = readRequired(data.location, "location");
+    const sessionTopic = readRequired(data.sessionTopic, "sessionTopic");
+    const availability = readRequired(data.availability, "availability");
+    const motivation = readRequired(data.motivation, "motivation");
+    const company = readOptional(data.company);
+    const phone = readOptional(data.phone);
+    const linkedin = readOptional(data.linkedin);
+
+    if (!isValidEmail(email)) {
+      throw new HttpsError("invalid-argument", "A valid email is required.");
+    }
+
+    const firestore = admin.firestore();
+    const existingApplication = await firestore
+      .collection("professional_applications")
+      .where("primaryEmailLowercase", "==", email)
+      .limit(1)
+      .get();
+
+    if (!existingApplication.empty) {
+      return {
+        ok: true,
+        alreadyExists: true,
+        applicationId: existingApplication.docs[0].id,
+        status: existingApplication.docs[0].data().status || "pending",
+      };
+    }
+
+    const existingProfessional = await firestore
+      .collection("professionals")
+      .where("personalDetails.primaryEmailLowercase", "==", email)
+      .limit(1)
+      .get();
+
+    if (!existingProfessional.empty) {
+      return {
+        ok: true,
+        alreadyExists: true,
+        professionalExists: true,
+        status: "approved",
+      };
+    }
+
+    const applicationRef = firestore.collection("professional_applications").doc();
+    const nameParts = fullName.split(/\s+/).filter((part) => part.length > 0);
+    const firstName = nameParts.shift() || fullName;
+    const lastName = nameParts.join(" ");
+
+    await applicationRef.set({
+      userId: null,
+      source: "web",
+      primaryEmail: email,
+      primaryEmailLowercase: email,
+      candidateProfessional: {
+        personalDetails: {
+          firstName,
+          lastName,
+          displayName: fullName,
+          primaryEmail: email,
+          primaryEmailLowercase: email,
+          primaryPhone: phone,
+        },
+        role,
+        company,
+        industries: [],
+        yearsExperience: Number.parseInt(experience, 10) || 0,
+        about: motivation,
+        highlights: [],
+        certificates: [],
+        address: {
+          fullAddress: location,
+          streetNumber: "",
+          streetName: "",
+          city: location,
+          province: "",
+          postalCode: "",
+          country: "",
+          latitude: 0,
+          longitude: 0,
+        },
+        sessionTopic,
+        proposedRate: 0,
+        sessionOffering: {topic: sessionTopic, price: 0},
+        sessionOfferings: [{topic: sessionTopic, price: 0}],
+        webLinks: {linkedin},
+      },
+      postApprovalSetup: {
+        availabilityPlan: availability,
+        availableCoffeeChatSlots: [],
+        availablePaidSessionSlots: [],
+      },
+      status: "pending",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const fields = [
+      ["Application ID", applicationRef.id],
+      ["Name", fullName],
+      ["Email", email],
+      ["Phone", phone || "Not provided"],
+      ["Role", role],
+      ["Company", company || "Not provided"],
+      ["Experience", experience],
+      ["Location", location],
+      ["Session topic", sessionTopic],
+      ["Availability", availability],
+      ["LinkedIn", linkedin || "Not provided"],
+      ["Motivation", motivation],
+    ];
+
+    await sendResendEmail({
+      to: contactRecipient,
+      replyTo: email,
+      subject: `TryMyDay web professional application from ${fullName}`,
+      text: fields.map(([label, value]) => `${label}: ${value}`).join("\n\n"),
+      html: fields
+        .map(([label, value]) => {
+          return `<p><strong>${escapeHtml(label)}:</strong><br>${escapeHtml(value)}</p>`;
+        })
+        .join(""),
+    });
+
+    logger.info("Web professional application recorded", {
+      applicationId: applicationRef.id,
+    });
+
+    return {ok: true, alreadyExists: false, applicationId: applicationRef.id};
+  },
+);
+
 async function sendAccountDeletionNotice({fullName, email, reason, requestId}) {
   const fields = [
     ["Request ID", requestId],

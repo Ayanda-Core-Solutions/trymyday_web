@@ -16,7 +16,11 @@ class _ProfessionalsPageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return const _PageShell(
       selectedNav: _NavDestination.professionals,
-      children: [_ProfessionalsHeroSection(), _Footer()],
+      children: [
+        _ProfessionalsHeroSection(),
+        _ProfessionalWebApplicationSection(),
+        _Footer(),
+      ],
     );
   }
 }
