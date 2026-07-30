@@ -14,6 +14,11 @@ class AppEnvironment {
     defaultValue: 'us-central1',
   );
 
+  static const String publicFunctionsProjectId = String.fromEnvironment(
+    'PUBLIC_FUNCTIONS_PROJECT_ID',
+    defaultValue: appEnv == 'prod' ? 'trymyday-1d798' : 'trymyday-nonprod',
+  );
+
   static const bool launchGateEnabled = bool.fromEnvironment(
     'LAUNCH_GATE_ENABLED',
   );

@@ -12,6 +12,7 @@ import '../../core/components/store_button.dart';
 import '../../core/services/account_deletion_request_service.dart';
 import '../../core/services/contact_email_service.dart';
 import '../../core/services/app_remote_config.dart';
+import '../../core/services/public_professional_service.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/external_link.dart';
 import '../../core/utils/app_icons.dart';

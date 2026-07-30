@@ -4,21 +4,24 @@ class ProfessionalPublicProfilePage extends StatelessWidget {
   const ProfessionalPublicProfilePage({
     super.key,
     required this.professionalId,
+    this.professionalService,
   });
 
   final String professionalId;
+  final PublicProfessionalService? professionalService;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: _fetchProfessionalByIdOrSlug(professionalId),
+      body: FutureBuilder<Map<String, dynamic>?>(
+        future: (professionalService ?? PublicProfessionalService())
+            .fetchByIdOrSlug(professionalId),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final data = snapshot.data?.data();
+          final data = snapshot.data;
           if (data == null) {
             return const _PageShell(
               selectedNav: _NavDestination.professionals,
@@ -36,22 +39,6 @@ class ProfessionalPublicProfilePage extends StatelessWidget {
         },
       ),
     );
-  }
-
-  Future<DocumentSnapshot<Map<String, dynamic>>> _fetchProfessionalByIdOrSlug(
-    String idOrSlug,
-  ) async {
-    final professionals = FirebaseFirestore.instance.collection(
-      'professionals',
-    );
-    final bySlug = await professionals
-        .where('shareSlug', isEqualTo: idOrSlug)
-        .limit(1)
-        .get();
-
-    if (bySlug.docs.isNotEmpty) return bySlug.docs.first;
-
-    return professionals.doc(idOrSlug).get();
   }
 }
 
