@@ -122,7 +122,7 @@ class PrivacyPolicyPage extends StatelessWidget {
         '9. Policy Updates\n'
         'We may update this Privacy Policy from time to time. Continued use of the app after updates means you accept the revised policy.\n\n'
         '10. Contact\n'
-        'If you have privacy questions, please contact support@trymayday.co.za.',
+        'If you have privacy questions, please contact support@trymyday.co.za.',
   );
 
   @override
@@ -210,7 +210,7 @@ class RefundsCancellationPolicyPage extends StatelessWidget {
         '8. Consumer Protection Act (CPA)\n'
         'This policy is intended to comply with the Consumer Protection Act (CPA) and other applicable South African laws. If any provision conflicts with law, the law takes precedence.\n\n'
         '9. Contact & Disputes\n'
-        'For cancellation or refund enquiries, contact support@trymayday.co.za.',
+        'For cancellation or refund enquiries, contact support@trymyday.co.za.',
   );
 
   @override

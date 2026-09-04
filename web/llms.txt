@@ -1,0 +1,22 @@
+# TryMyDay
+
+> TryMyDay connects people with experienced professionals for practical career guidance through real conversations.
+
+TryMyDay is designed for students, graduates, career switchers, and anyone seeking clearer information about a career path. Users can discover professionals, start with a short free coffee chat, and book focused paid sessions where available.
+
+## Important pages
+
+- [Home](https://trymyday.co.za/): Overview of TryMyDay and how it works.
+- [About](https://trymyday.co.za/about): Mission, audience, and approach to career guidance.
+- [FAQs](https://trymyday.co.za/faq): Answers about coffee chats, bookings, rates, scheduling, and sessions.
+- [Professionals](https://trymyday.co.za/professionals): Information for professionals who want to share their experience.
+- [Contact](https://trymyday.co.za/contact): Official support and contact options.
+
+## Key facts
+
+- TryMyDay provides access to real professionals and practical career insight.
+- A free coffee chat is a short video or voice conversation for initial questions.
+- Professionals can set their own rates and availability for paid sessions.
+- TryMyDay serves users in South Africa.
+
+Official contact: hello@trymyday.co.za
