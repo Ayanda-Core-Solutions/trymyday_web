@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-ZA">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -18,7 +18,24 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Career guidance through real conversations.">
+  <meta name="description" content="Connect with experienced professionals for honest career advice, free coffee chats, and focused one-on-one sessions.">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="theme-color" content="#165a56">
+  <link rel="canonical" href="https://trymyday.co.za/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TryMyDay">
+  <meta property="og:locale" content="en_ZA">
+  <meta property="og:title" content="TryMyDay | Career Guidance from Experienced Professionals">
+  <meta property="og:description" content="Connect with experienced professionals for honest career advice, free coffee chats, and focused one-on-one sessions.">
+  <meta property="og:url" content="https://trymyday.co.za/">
+  <meta property="og:image" content="https://trymyday.co.za/icons/Icon-512.png">
+  <meta property="og:image:alt" content="TryMyDay logo">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TryMyDay | Career Guidance from Experienced Professionals">
+  <meta name="twitter:description" content="Connect with experienced professionals for honest career advice, free coffee chats, and focused one-on-one sessions.">
+  <meta name="twitter:image" content="https://trymyday.co.za/icons/Icon-512.png">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -30,8 +47,34 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
   <link rel="shortcut icon" href="favicon.svg"/>
 
-  <title>TryMyDay</title>
+  <title>TryMyDay | Career Guidance from Experienced Professionals</title>
   <link rel="manifest" href="manifest.json">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://trymyday.co.za/#organization",
+          "name": "TryMyDay",
+          "url": "https://trymyday.co.za/",
+          "logo": "https://trymyday.co.za/icons/Icon-512.png",
+          "description": "TryMyDay connects people with experienced professionals for practical career guidance and real conversations.",
+          "areaServed": {"@type": "Country", "name": "South Africa"},
+          "email": "hello@trymyday.co.za"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://trymyday.co.za/#website",
+          "url": "https://trymyday.co.za/",
+          "name": "TryMyDay",
+          "publisher": {"@id": "https://trymyday.co.za/#organization"},
+          "inLanguage": "en-ZA"
+        }
+      ]
+    }
+  </script>
+  <script src="/seo_runtime.js"></script>
   <style>
     :root {
       --trymyday-primary: #165a56;
@@ -167,6 +210,10 @@
   <script>
     window.addEventListener('flutter-first-frame', function () {
       const loader = document.getElementById('app-loader');
+      const seoContent = document.getElementById('seo-content');
+      if (seoContent) {
+        seoContent.remove();
+      }
       if (loader) {
         loader.classList.add('is-hidden');
         window.setTimeout(function () {

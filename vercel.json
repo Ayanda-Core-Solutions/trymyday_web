@@ -2,15 +2,49 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "git clone https://github.com/flutter/flutter.git --depth 1 --branch stable .flutter && ./.flutter/bin/flutter config --enable-web && ./.flutter/bin/flutter pub get",
-  "buildCommand": "./.flutter/bin/flutter build web --release",
+  "buildCommand": "./.flutter/bin/flutter build web --release && node scripts/generate_seo_pages.mjs",
   "outputDirectory": "build/web",
   "rewrites": [
+    {
+      "source": "/about",
+      "destination": "/seo/about.html"
+    },
+    {
+      "source": "/faq",
+      "destination": "/seo/faq.html"
+    },
+    {
+      "source": "/professionals",
+      "destination": "/seo/professionals.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/seo/contact.html"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
+    {
+      "source": "/auth/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/launch",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
     {
       "source": "/.well-known/apple-app-site-association",
       "headers": [
