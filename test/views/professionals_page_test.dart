@@ -29,9 +29,52 @@ void main() {
       find.text('Share your experience. Help someone move forward.'),
       findsOneWidget,
     );
-    expect(find.text('Build your profile'), findsOneWidget);
-    expect(find.text('Set availability'), findsOneWidget);
-    expect(find.text('Earn while giving back'), findsOneWidget);
+    expect(find.text('1. Create your profile'), findsOneWidget);
+    expect(find.text('2. Add your first session'), findsOneWidget);
+    expect(find.text('3. Review and go live'), findsOneWidget);
+  });
+
+  testWidgets('collects a coarse service area for online sessions', (
+    WidgetTester tester,
+  ) async {
+    await pumpDesktopApp(tester);
+    await tester.tap(find.byKey(const ValueKey('nav-professionals')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Step 1 of 2 · Tell us the essentials. You do not need an account to get started.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('What can someone book you to discuss?'), findsNothing);
+    expect(
+      find.text(
+        'All sessions are online. We only use your province and area to help people discover relevant professionals.',
+      ),
+      findsOneWidget,
+    );
+
+    final fields = find.byType(TextFormField);
+    await tester.enterText(fields.at(0), 'Sam Professional');
+    await tester.enterText(fields.at(1), 'sam@example.com');
+    await tester.enterText(fields.at(2), 'Product Manager');
+    await tester.enterText(fields.at(3), '8');
+    await tester.enterText(fields.at(4), 'Sandton');
+    final provinceField = find.byKey(const ValueKey('professional-province'));
+    await tester.ensureVisible(provinceField);
+    await tester.tap(provinceField);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Gauteng').last);
+    await tester.pumpAndSettle();
+    final continueButton = find.byKey(
+      const ValueKey('professional-application-continue'),
+    );
+    await tester.ensureVisible(continueButton);
+    await tester.tap(continueButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Set up your first session'), findsOneWidget);
   });
 
   testWidgets('returns home when the logo is tapped from professionals', (

@@ -141,7 +141,9 @@ exports.submitWebProfessionalApplication = onCall(
     const email = readRequired(data.email, "email").toLowerCase();
     const role = readRequired(data.role, "role");
     const experience = readRequired(data.experience, "experience");
-    const location = readRequired(data.location, "location");
+    const province = readRequired(data.province, "province");
+    const area = readRequired(data.area, "area");
+    const location = `${area}, ${province}`;
     const sessionTopic = readRequired(data.sessionTopic, "sessionTopic");
     const availability = readRequired(data.availability, "availability");
     const motivation = readRequired(data.motivation, "motivation");
@@ -211,13 +213,13 @@ exports.submitWebProfessionalApplication = onCall(
         highlights: [],
         certificates: [],
         address: {
-          fullAddress: location,
+          fullAddress: `${area}, ${province}, South Africa`,
           streetNumber: "",
           streetName: "",
-          city: location,
-          province: "",
+          city: area,
+          province,
           postalCode: "",
-          country: "",
+          country: "South Africa",
           latitude: 0,
           longitude: 0,
         },

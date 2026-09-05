@@ -8,23 +8,23 @@ class _ProfessionalsHeroSection extends StatelessWidget {
     const cards = [
       (
         icon: Icons.badge_outlined,
-        title: 'Build your profile',
+        title: '1. Create your profile',
         body:
-            'Add your role, company, experience, highlights, and certifications to create trust.',
+            'Start with your role, experience, province, and service area. No exact address is needed.',
         highlighted: false,
       ),
       (
         icon: Icons.schedule_outlined,
-        title: 'Set availability',
+        title: '2. Add your first session',
         body:
-            'Create session windows, choose session type, set location, and define your hourly rate.',
+            'Describe one useful conversation and tell us when you are usually available.',
         highlighted: false,
       ),
       (
         icon: Icons.paid_outlined,
-        title: 'Earn while giving back',
+        title: '3. Review and go live',
         body:
-            'Use free coffee chats for quick discovery and paid sessions for more focused mentorship.',
+            'Finish scheduling while we review your profile, then publish free or paid sessions.',
         highlighted: false,
       ),
     ];
@@ -123,7 +123,7 @@ class _ProfessionalsHeroSection extends StatelessWidget {
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1180),
                     child: const Text(
-                      'Professionals can create profiles, set availability, offer quick coffee chats, and earn from paid sessions. This page is designed to feel credible and light, with enough structure to reassure busy experts that the platform is easy to manage.',
+                      'Create your professional profile in minutes, add the first conversation you want to offer, and share when you are available. You can prepare your schedule while we review your profile.',
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 19,
@@ -253,6 +253,18 @@ enum _ProfessionalApplicationSubmitState {
   error,
 }
 
+const _southAfricanProvinces = [
+  'Eastern Cape',
+  'Free State',
+  'Gauteng',
+  'KwaZulu-Natal',
+  'Limpopo',
+  'Mpumalanga',
+  'North West',
+  'Northern Cape',
+  'Western Cape',
+];
+
 class _ProfessionalWebApplicationSection extends StatefulWidget {
   const _ProfessionalWebApplicationSection();
 
@@ -270,7 +282,7 @@ class _ProfessionalWebApplicationSectionState
   final _roleController = TextEditingController();
   final _companyController = TextEditingController();
   final _experienceController = TextEditingController();
-  final _locationController = TextEditingController();
+  final _areaController = TextEditingController();
   final _sessionTopicController = TextEditingController();
   final _availabilityController = TextEditingController();
   final _linkedinController = TextEditingController();
@@ -279,6 +291,8 @@ class _ProfessionalWebApplicationSectionState
   _ProfessionalApplicationSubmitState _submitState =
       _ProfessionalApplicationSubmitState.idle;
   String? _statusMessage;
+  int _currentStep = 0;
+  String? _selectedProvince;
 
   @override
   void dispose() {
@@ -288,7 +302,7 @@ class _ProfessionalWebApplicationSectionState
     _roleController.dispose();
     _companyController.dispose();
     _experienceController.dispose();
-    _locationController.dispose();
+    _areaController.dispose();
     _sessionTopicController.dispose();
     _availabilityController.dispose();
     _linkedinController.dispose();
@@ -355,8 +369,10 @@ class _ProfessionalWebApplicationSectionState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Start your application',
+            Text(
+              _currentStep == 0
+                  ? 'Create your professional profile'
+                  : 'Set up your first session',
               style: TextStyle(
                 color: AppColors.primary,
                 fontSize: 24,
@@ -364,96 +380,236 @@ class _ProfessionalWebApplicationSectionState
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Web applicants can start without signing in. We use your email to prevent duplicate applications and contact you during review.',
+            Text(
+              _currentStep == 0
+                  ? 'Step 1 of 2 · Tell us the essentials. You do not need an account to get started.'
+                  : 'Step 2 of 2 · Add one conversation people can book and a simple availability plan.',
               style: TextStyle(
                 color: AppColors.textMuted,
                 fontSize: 15,
                 height: 1.45,
               ),
             ),
-            const SizedBox(height: 24),
-            _ApplicationInput(
-              controller: _fullNameController,
-              label: 'Full name',
-            ),
-            _ApplicationInput(
-              controller: _emailController,
-              label: 'Email',
-              keyboardType: TextInputType.emailAddress,
-            ),
-            _ApplicationInput(
-              controller: _phoneController,
-              label: 'Phone number',
-              required: false,
-              keyboardType: TextInputType.phone,
-            ),
-            _ApplicationInput(
-              controller: _roleController,
-              label: 'Current role',
-            ),
-            _ApplicationInput(
-              controller: _companyController,
-              label: 'Company or practice',
-              required: false,
-            ),
-            _ApplicationInput(
-              controller: _experienceController,
-              label: 'Years of experience',
-              keyboardType: TextInputType.number,
-            ),
-            _ApplicationInput(
-              controller: _locationController,
-              label: 'Professional location',
-            ),
-            _ApplicationInput(
-              controller: _sessionTopicController,
-              label: 'One session people can book with you',
-            ),
-            _ApplicationInput(
-              controller: _availabilityController,
-              label: 'Availability idea',
-              hintText:
-                  'Example: Weekdays at 09:00 and 13:00, coffee chats 12:00-13:00',
-              maxLines: 3,
-            ),
-            _ApplicationInput(
-              controller: _linkedinController,
-              label: 'LinkedIn or portfolio',
-              required: false,
-            ),
-            _ApplicationInput(
-              controller: _motivationController,
-              label: 'Why should people book you?',
-              maxLines: 4,
-            ),
-            const SizedBox(height: 8),
-            FilledButton.icon(
-              onPressed:
-                  _submitState == _ProfessionalApplicationSubmitState.sending
-                  ? null
-                  : _submit,
-              icon: _submitState == _ProfessionalApplicationSubmitState.sending
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.arrow_forward_rounded),
-              label: Text(
-                _submitState == _ProfessionalApplicationSubmitState.sending
-                    ? 'Submitting...'
-                    : 'Submit Application',
+            const SizedBox(height: 18),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                minHeight: 6,
+                value: _currentStep == 0 ? 0.5 : 1,
+                backgroundColor: AppColors.surfaceMuted,
+                color: AppColors.secondary,
               ),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.secondary,
-                foregroundColor: AppColors.primary,
-                minimumSize: const Size.fromHeight(56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+            ),
+            const SizedBox(height: 24),
+            if (_currentStep == 0) ...[
+              _ApplicationInput(
+                controller: _fullNameController,
+                label: 'Full name',
+                textInputAction: TextInputAction.next,
+              ),
+              _ApplicationInput(
+                controller: _emailController,
+                label: 'Email',
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+              ),
+              _ApplicationInput(
+                controller: _roleController,
+                label: 'Current role',
+                textInputAction: TextInputAction.next,
+              ),
+              _ApplicationInput(
+                controller: _experienceController,
+                label: 'Years of experience',
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Province',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      key: const ValueKey('professional-province'),
+                      initialValue: _selectedProvince,
+                      isExpanded: true,
+                      hint: const Text('Select your province'),
+                      items: _southAfricanProvinces
+                          .map(
+                            (province) => DropdownMenuItem(
+                              value: province,
+                              child: Text(province),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) =>
+                          setState(() => _selectedProvince = value),
+                      validator: (value) =>
+                          value == null ? 'Select your province' : null,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: AppColors.background,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
+              _ApplicationInput(
+                controller: _areaController,
+                label: 'City or area',
+                hintText: 'Example: Sandton or Johannesburg',
+                textInputAction: TextInputAction.done,
+              ),
+              Container(
+                margin: const EdgeInsets.only(bottom: 18),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.videocam_outlined, color: AppColors.primary),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'All sessions are online. We only use your province and area to help people discover relevant professionals.',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              FilledButton.icon(
+                key: const ValueKey('professional-application-continue'),
+                onPressed: _continueToSession,
+                icon: const Icon(Icons.arrow_forward_rounded),
+                label: const Text('Continue to session setup'),
+                style: _primaryApplicationButtonStyle(),
+              ),
+            ] else ...[
+              _ApplicationInput(
+                controller: _sessionTopicController,
+                label: 'What can someone book you to discuss?',
+                hintText: 'Example: Breaking into product management',
+                textInputAction: TextInputAction.next,
+              ),
+              _ApplicationInput(
+                controller: _availabilityController,
+                label: 'When are you usually available?',
+                hintText: 'Example: Tuesdays and Thursdays, 18:00–20:00',
+                maxLines: 2,
+              ),
+              _ApplicationInput(
+                controller: _motivationController,
+                label: 'What experience can you share?',
+                hintText:
+                    'A short introduction that helps people understand how you can help.',
+                maxLines: 3,
+              ),
+              Material(
+                color: Colors.transparent,
+                child: ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Add optional details',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  subtitle: const Text('Phone, company, and professional link'),
+                  children: [
+                    const SizedBox(height: 8),
+                    _ApplicationInput(
+                      controller: _phoneController,
+                      label: 'Phone number',
+                      required: false,
+                      keyboardType: TextInputType.phone,
+                    ),
+                    _ApplicationInput(
+                      controller: _companyController,
+                      label: 'Company or practice',
+                      required: false,
+                    ),
+                    _ApplicationInput(
+                      controller: _linkedinController,
+                      label: 'LinkedIn or portfolio',
+                      required: false,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  TextButton.icon(
+                    onPressed:
+                        _submitState ==
+                            _ProfessionalApplicationSubmitState.sending
+                        ? null
+                        : () => setState(() => _currentStep = 0),
+                    icon: const Icon(Icons.arrow_back_rounded),
+                    label: const Text('Back'),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton.icon(
+                      key: const ValueKey('professional-application-submit'),
+                      onPressed:
+                          _submitState ==
+                              _ProfessionalApplicationSubmitState.sending
+                          ? null
+                          : _submit,
+                      icon:
+                          _submitState ==
+                              _ProfessionalApplicationSubmitState.sending
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.check_rounded),
+                      label: Text(
+                        _submitState ==
+                                _ProfessionalApplicationSubmitState.sending
+                            ? 'Submitting...'
+                            : 'Submit profile',
+                      ),
+                      style: _primaryApplicationButtonStyle(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
             if (_statusMessage != null) ...[
               const SizedBox(height: 16),
               Text(
@@ -469,6 +625,23 @@ class _ProfessionalWebApplicationSectionState
         ),
       ),
     );
+  }
+
+  ButtonStyle _primaryApplicationButtonStyle() {
+    return FilledButton.styleFrom(
+      backgroundColor: AppColors.secondary,
+      foregroundColor: AppColors.primary,
+      minimumSize: const Size.fromHeight(56),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    );
+  }
+
+  void _continueToSession() {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _currentStep = 1;
+      _statusMessage = null;
+    });
   }
 
   Future<void> _submit() async {
@@ -489,7 +662,9 @@ class _ProfessionalWebApplicationSectionState
         'role': _roleController.text.trim(),
         'company': _companyController.text.trim(),
         'experience': _experienceController.text.trim(),
-        'location': _locationController.text.trim(),
+        'sessionFormat': 'online',
+        'province': _selectedProvince,
+        'area': _areaController.text.trim(),
         'sessionTopic': _sessionTopicController.text.trim(),
         'availability': _availabilityController.text.trim(),
         'linkedin': _linkedinController.text.trim(),
@@ -540,7 +715,7 @@ class _ProfessionalApplicationIntro extends StatelessWidget {
           ),
           SizedBox(height: 18),
           Text(
-            'Start with your expertise, one bookable session, and a practical availability plan. After approval your profile can go live for bookings.',
+            'Start in two short steps. You can prepare your first session immediately, and we only make the profile public after review.',
             style: TextStyle(
               color: AppColors.primary,
               fontSize: 18,
@@ -550,19 +725,18 @@ class _ProfessionalApplicationIntro extends StatelessWidget {
           SizedBox(height: 28),
           _ApplicationChecklistItem(
             icon: Icons.mail_outline_rounded,
-            text:
-                'Email-based duplicate checks reduce unnecessary applications.',
+            text: 'No account or password is needed to begin.',
           ),
           SizedBox(height: 14),
           _ApplicationChecklistItem(
             icon: Icons.verified_user_outlined,
-            text: 'The review team approves profiles before they go live.',
+            text: 'Create your first session and availability as a draft.',
           ),
           SizedBox(height: 14),
           _ApplicationChecklistItem(
             icon: Icons.event_available_outlined,
             text:
-                'Your session and availability are shaped around real bookable slots.',
+                'Your profile goes live after a quick trust and safety review.',
           ),
         ],
       ),
@@ -607,6 +781,7 @@ class _ApplicationInput extends StatelessWidget {
     this.required = true,
     this.keyboardType,
     this.maxLines = 1,
+    this.textInputAction,
   });
 
   final TextEditingController controller;
@@ -615,6 +790,7 @@ class _ApplicationInput extends StatelessWidget {
   final bool required;
   final TextInputType? keyboardType;
   final int maxLines;
+  final TextInputAction? textInputAction;
 
   @override
   Widget build(BuildContext context) {
@@ -636,6 +812,7 @@ class _ApplicationInput extends StatelessWidget {
             controller: controller,
             keyboardType: keyboardType,
             maxLines: maxLines,
+            textInputAction: textInputAction,
             validator: (value) {
               if (!required) return null;
               if ((value ?? '').trim().isEmpty) return 'Required';

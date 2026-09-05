@@ -35,13 +35,13 @@ const pages = [
   {
     slug: 'professionals',
     title: 'Become a TryMyDay Professional | Share Your Experience',
-    description: 'Create a professional profile, offer free coffee chats or paid career sessions, set your availability, and help others make informed career choices.',
-    heading: 'Turn your professional experience into someone else’s clarity',
-    body: 'Professionals on TryMyDay share practical career insight through short coffee chats and focused paid sessions.',
+    description: 'Create your TryMyDay professional profile in two short steps, prepare your first session and availability, and go live after review.',
+    heading: 'Create your professional profile in minutes',
+    body: 'Start without an account, prepare your first bookable conversation, and finish scheduling while TryMyDay reviews your profile.',
     sections: [
-      ['Build your profile', 'Show your experience, field, interests, and the topics you can help people understand.'],
-      ['Set your availability', 'Choose when you are available for conversations and manage session options.'],
-      ['Earn while giving back', 'Offer free discovery conversations and paid sessions for focused mentorship.']
+      ['Create your profile', 'Add your name, role, experience, province, and service area. No exact address is collected.'],
+      ['Add your first session', 'Describe one useful conversation and share when you are usually available.'],
+      ['Review and go live', 'Prepare your schedule as a draft while TryMyDay completes a trust and safety review.']
     ]
   },
   {
