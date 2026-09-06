@@ -90,6 +90,7 @@ function renderContent(page) {
 function renderPage(page) {
   const canonical = `https://trymyday.co.za/${page.slug}`;
   return source
+    .replace(/\s*<main id="homepage-seo-content"[\s\S]*?<\/main>/, '')
     .replace('<base href="$FLUTTER_BASE_HREF">', '<base href="/">')
     .replace(/<title>.*?<\/title>/, `<title>${escapeHtml(page.title)}</title>`)
     .replace(/(<meta name="description" content=")[^"]*(">)/, `$1${escapeHtml(page.description)}$2`)

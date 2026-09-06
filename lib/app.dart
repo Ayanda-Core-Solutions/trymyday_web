@@ -109,7 +109,7 @@ class TryMyDayApp extends StatelessWidget {
     final baseTheme = ThemeData.light(useMaterial3: true);
 
     return MaterialApp.router(
-      title: 'TryMyDay',
+      title: 'TryMyDay | Career Guidance from Experienced Professionals',
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
       theme: baseTheme.copyWith(
